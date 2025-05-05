@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Honkai: Star Rail - LimitBreak.gg</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      display: flex; 
+      min-height: 100vh; 
+      background-color: #1a1a2e; 
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      width: 100%;
+      padding: 15px 20px;
+      background: linear-gradient(145deg, #0f0f3d, #1a1a2e);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+    header a { text-decoration: none; color: #00d4ff; font-size: 2rem; font-weight: bold; }
+    header .social-links a { margin-left: 15px; color: #00d4ff; font-size: 1.2rem; }
+    .sidebar { width: 20%; padding: 100px 20px 20px; background-color: #0f0f3d; border-right: 2px solid #00d4ff; display: flex; flex-direction: column; gap: 20px; position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar button { padding: 10px; background-color: #1a1a2e; color: #fff; border: none; border-radius: 10px; text-align: center; cursor: pointer; transition: background-color 0.3s; }
+    .sidebar button:hover { background-color: #00d4ff; color: #1a1a2e; }
+    .content { margin-left: 20%; padding: 100px 20px 20px; width: 80%; }
+    .section { margin-bottom: 20px; padding: 20px; background-color: #1a1a2e; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); display: none; }
+    .section.active { display: block; }
+    .section h2 { margin-bottom: 10px; color: #00d4ff; }
+    .sort-section { margin-top: 10px; padding-top: 10px; border-top: 2px solid #00d4ff; }
+    .sort-category { margin-bottom: 10px; }
+    .sort-category img { width: 40px; height: 40px; cursor: pointer; margin-right: 10px; transition: transform 0.2s; }
+    .sort-category img:hover { transform: scale(1.2); }
+
+    /* Стили для списка персонажей */
+    .character-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .character-item {
+      position: relative;
+      width: 200px;
+      height: 300px;
+      cursor: pointer;
+    }
+
+    .character-image-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .character-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .character-image:hover {
+      transform: scale(1.1);
+    }
+
+    .dmg_type {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .path_type {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .character-name {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="mainLobi.html">LimitBreak.gg</a>
+    <div class="social-links">
+      <a href="#">Discord</a>
+      <a href="#">Telegram</a>
+    </div>
+  </header>
+  <div class="sidebar">
+    <button onclick="showSection('characters')">Персонажи</button>
+    <button onclick="showSection('tierlist')">Тир Лист</button>
+    <button onclick="location.href='hsr_calculator.php'">Калькулятор</button>
+  </div>
+  <div class="content">
+    <div id="characters" class="section active">
+      <h2>Персонажи (<span id="character-count">0</span>)</h2>
+      <div class="sort-section">
+        <div class="sort-category">
+          <h3>Редкость:</h3>
+          <button onclick="filterCharacters('rarity', 'all')">Все</button>
+          <button onclick="filterCharacters('rarity', '4★')">4★</button>
+          <button onclick="filterCharacters('rarity', '5★')">5★</button>
+        </div>
+        <div class="sort-category">
+          <h3>Тип урона:</h3>
+          <button onclick="filterCharacters('damageType', 'all')">Все</button>
+          <img src="damageType_image/physical.png" alt="Физический" title="Физический" onclick="filterCharacters('damageType', 'Физический')">
+          <img src="damageType_image/fire.png" alt="Огненный" title="Огненный" onclick="filterCharacters('damageType', 'Огненный')">
+          <img src="damageType_image/ice.png" alt="Ледяной" title="Ледяной" onclick="filterCharacters('damageType', 'Ледяной')">
+          <img src="damageType_image/electric.png" alt="Электрический" title="Электрический" onclick="filterCharacters('damageType', 'Электрический')">
+          <img src="damageType_image/wind.png" alt="Ветряной" title="Ветряной" onclick="filterCharacters('damageType', 'Ветряной')">
+          <img src="damageType_image/quantum.png" alt="Квантовый" title="Квантовый" onclick="filterCharacters('damageType', 'Квантовый')">
+          <img src="damageType_image/imaginary.png" alt="Мнимый" title="Мнимый" onclick="filterCharacters('damageType', 'Мнимый')">
+        </div>
+        <div class="sort-category">
+          <h3>Путь персонажа:</h3>
+          <button onclick="filterCharacters('path', 'all')">Все</button>
+          <img src="path_image/abundance.png" alt="Изобилие" title="Изобилие" onclick="filterCharacters('path', 'Изобилие')">
+          <img src="path_image/destruction.png" alt="Разрушение" title="Разрушение" onclick="filterCharacters('path', 'Разрушение')">
+          <img src="path_image/erudition.png" alt="Эрудиция" title="Эрудиция" onclick="filterCharacters('path', 'Эрудиция')">
+          <img src="path_image/harmony.png" alt="Гармония" title="Гармония" onclick="filterCharacters('path', 'Гармония')">
+          <img src="path_image/hunt.png" alt="Охота" title="Охота" onclick="filterCharacters('path', 'Охота')">
+          <img src="path_image/nihility.png" alt="Небытие" title="Небытие" onclick="filterCharacters('path', 'Небытие')">
+          <img src="path_image/preservation.png" alt="Сохранение" title="Сохранение" onclick="filterCharacters('path', 'Сохранение')">
+          <img src="path_image/remembrance.png" alt="Память" title="Память" onclick="filterCharacters('path', 'Память')">
+        </div>
+      </div>
+      <div class="character-list" id="character-list">
+        <!-- Персонажи будут добавляться динамически -->
+      </div>
+    </div>
+    <div id="tierlist" class="section">
+      <h2>Тир Лист</h2>
+      <p>Здесь будет тир-лист...</p>
+    </div>
+  </div>
+  <script>
+    let characters = [];
+
+    let activeFilters = {
+      rarity: 'all',
+      dmg_type: 'all',
+      path: 'all'
+    };
+
+    function filterCharacters(property, value) {
+      activeFilters[property] = value === 'all' ? 'all' : value;
+
+      const filtered = characters.filter(character => {
+        return (
+          (activeFilters.rarity === 'all' || character.rarity === activeFilters.rarity) &&
+          (activeFilters.damageType === 'all' || character.dmg_type.includes(activeFilters.damageType)) &&
+          (activeFilters.path === 'all' || character.path === activeFilters.path)
+        );
+      });
+
+      renderCharacters(filtered);
+    }
+
+    function renderCharacters(list) {
+      const container = document.getElementById('character-list');
+      document.getElementById('character-count').textContent = list.length;
+      container.innerHTML = '';
+
+      list.forEach(character => {
+        const div = document.createElement('div');
+        div.className = 'character-item';
+        div.innerHTML = `
+          <div class="character-image-container">
+            <img src="character_image/${character.image}" alt="${character.name}" class="character-image">
+            <img src="damageType_image/${character.dmg_type_image}" alt="${character.dmg_type}" class="dmg_type">
+            <img src="path_image/${character.path_image}" alt="${character.path}" class="path_type">
+            <div class="character-name">${character.name}</div>
+          </div>
+        `;
+
+        div.addEventListener('click', () => {
+          window.location.href = `https://limitbreak.gg/hsr_guide.html?id=${character.id}`;
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    function loadCharacters() {
+      fetch('get_HSRcharacters_for_main.php')
+        .then(response => response.json())
+        .then(data => {
+          characters = data;
+          renderCharacters(characters);
+        })
+        .catch(error => console.error('Ошибка загрузки персонажей:', error));
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCharacters);
+  </script>
+</body>
+</html>
