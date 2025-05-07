@@ -1,25 +1,25 @@
-const pathIcons = {
-  'Память': 'path_image/remembrance.png',
-  'Охотник': 'path_image/hunt.png',
-  'Разрушитель': 'path_image/destruction.png',
-  'Небытие': 'path_image/nihility.png',
-  'Гармония': 'path_image/harmony.png',
-  'Сохранение': 'path_image/preservation.png',
-  'Изобилие': 'path_image/abundance.png',
-  'Эрудиция': 'path_image/erudition.png'
-};
-
-const elementIcons = {
-  'Огонь': 'damageType_image/fire.png',
-  'Лёд': 'damageType_image/ice.png',
-  'Физический': 'damageType_image/physical.png',
-  'Квантовый': 'damageType_image/quantum.png',
-  'Воображение': 'damageType_image/imaginary.png',
-  'Электричество': 'damageType_image/lightning.png',
-  'Ветер': 'damageType_image/wind.png'
-};
-
 document.addEventListener('DOMContentLoaded', function () {
+  const pathIcons = {
+    'Память': 'path_image/remembrance.png',
+    'Охотник': 'path_image/hunt.png',
+    'Разрушитель': 'path_image/destruction.png',
+    'Небытие': 'path_image/nihility.png',
+    'Гармония': 'path_image/harmony.png',
+    'Сохранение': 'path_image/preservation.png',
+    'Изобилие': 'path_image/abundance.png',
+    'Эрудиция': 'path_image/erudition.png'
+  };
+
+  const elementIcons = {
+    'Огонь': 'damageType_image/fire.png',
+    'Лёд': 'damageType_image/ice.png',
+    'Физический': 'damageType_image/physical.png',
+    'Квантовый': 'damageType_image/quantum.png',
+    'Воображение': 'damageType_image/imaginary.png',
+    'Электричество': 'damageType_image/lightning.png',
+    'Ветер': 'damageType_image/wind.png'
+  };
+
   const params = new URLSearchParams(window.location.search);
   const characterId = params.get('id');
 
@@ -27,10 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(response => response.json())
     .then(data => {
       const char = data.character;
-      console.log('ВСЯ СТРУКТУРА char:', char);
-      console.log('char.path:', `"${char.path}"`);
-      console.log('data.memorysprite_skills:', data.memorysprite_skills);
-
 
       document.getElementById('character-name').innerText = char.name || '???';
       document.getElementById('rarity').innerText = char.rarity || '-';
@@ -57,17 +53,17 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(row);
       });
 
-      const skillsList = document.querySelector('.skills-list');
-      skillsList.innerHTML = '';
-
-      data.skills.forEach(skill => {
+      function createSkillItem(skill) {
         const li = document.createElement('li');
         li.className = 'skill-item';
 
         const title = document.createElement('div');
         title.className = 'skill-title';
 
-        // Левая часть: Lv. + Название
+        const typeLabel = document.createElement('div');
+        typeLabel.className = 'skill-type';
+        typeLabel.innerText = skill.type || '';
+
         const nameLine = document.createElement('div');
         nameLine.className = 'skill-name-line';
 
@@ -75,128 +71,64 @@ document.addEventListener('DOMContentLoaded', function () {
         levelLabel.className = 'skill-lv';
         levelLabel.innerText = 'Lv. 1';
 
-        const skillName = document.createElement('span');
-        skillName.className = 'skill-name';
-        skillName.innerText = skill.name;
+        const nameText = document.createElement('span');
+        nameText.className = 'skill-name';
+        nameText.innerText = skill.name || 'Без названия';
 
         nameLine.appendChild(levelLabel);
-        nameLine.appendChild(skillName);
-
-        // Правая часть: Тип навыка
-        const skillType = document.createElement('span');
-        skillType.className = 'skill-type';
-        skillType.innerText = `${skill.type}`;
-
+        nameLine.appendChild(nameText);
         title.appendChild(nameLine);
-        title.appendChild(skillType);
+        title.appendChild(typeLabel);
 
-        // Описание
-        const descBox = document.createElement('div');
-        descBox.className = 'skill-description';
-        if (skill.description_level && skill.description_level.length > 0) {
-          descBox.innerText = skill.description_level[0];
-        } else if (skill.description) {
-          descBox.innerText = skill.description;
+        const description = document.createElement('div');
+        description.className = 'skill-description';
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = 1;
+        let maxLevel = 1;
+
+        if (Array.isArray(skill.description_level) && skill.description_level.length > 1) {
+          maxLevel = skill.description_level.length;
+          slider.max = maxLevel;
+          slider.value = 1;
+          description.innerText = skill.description_level[0];
+          slider.addEventListener('input', function () {
+            levelLabel.innerText = 'Lv. ' + slider.value;
+            description.innerText = skill.description_level[slider.value - 1] || 'Описание недоступно';
+          });
         } else {
-          descBox.innerText = 'Описание отсутствует';
+          slider.style.display = 'none';
+          description.innerText = skill.description || 'Описание недоступно';
         }
 
         li.appendChild(title);
-        li.appendChild(descBox);
+        li.appendChild(description);
+        li.appendChild(slider);
 
-        // Слайдер уровней
-        if (skill.description_level && skill.description_level.length > 1 && skill.type !== 'Талант' && skill.type !== 'Техника') {
-          const slider = document.createElement('input');
-          slider.type = 'range';
-          slider.min = 1;
-          slider.max = skill.description_level.length;
-          slider.value = 1;
-          slider.addEventListener('input', () => {
-            descBox.innerText = skill.description_level[slider.value - 1];
-            levelLabel.innerText = `Lv. ${slider.value}`;
-          });
-          li.appendChild(slider);
-        }
+        return li;
+      }
 
-        skillsList.appendChild(li);
-      });
+      const skillsList = document.querySelector('.skills-list');
+      skillsList.innerHTML = '';
 
-      // Вставь до: if (char.path.trim() === 'Память' && Array.isArray(data.memorysprite_skills))
-      console.log('ПРОВЕРКА: путь =', `"${char.path}"`, 'тип:', typeof data.memorysprite_skills, 'isArray:', Array.isArray(data.memorysprite_skills));
-
-      // === НАВЫКИ МЕМОСПРАЙТА (если есть) ===
-      if (char.path.trim() === 'Память' && Array.isArray(data.memorysprite_skills)) {
-        console.log('Навыки мемоспрайта загружены:', data.memorysprite_skills);
-
-        const memoskillsHeader = document.createElement('h2');
-        memoskillsHeader.innerText = 'НАВЫКИ МЕМОСПРАЙТА';
-        skillsList.parentNode.insertBefore(memoskillsHeader, skillsList.nextSibling);
-
-        const memorySkillsList = document.createElement('ul');
-        memorySkillsList.className = 'skills-list';
-        skillsList.parentNode.insertBefore(memorySkillsList, memoskillsHeader.nextSibling);
-
-        data.memorysprite_skills.forEach(skill => {
-          console.log('Обрабатываю мемо-скилл:', skill.name);
-
-          const li = document.createElement('li');
-          li.className = 'skill-item';
-
-          const title = document.createElement('div');
-          title.className = 'skill-title';
-
-          const nameLine = document.createElement('div');
-          nameLine.className = 'skill-name-line';
-
-          const levelLabel = document.createElement('span');
-          levelLabel.className = 'skill-lv';
-          levelLabel.innerText = 'Lv. 1';
-
-          const skillName = document.createElement('span');
-          skillName.className = 'skill-name';
-          skillName.innerText = skill.name;
-
-          nameLine.appendChild(levelLabel);
-          nameLine.appendChild(skillName);
-
-          const skillType = document.createElement('span');
-          skillType.className = 'skill-type';
-          skillType.innerText = `(${skill.type})`;
-
-          title.appendChild(nameLine);
-          title.appendChild(skillType);
-
-          const descBox = document.createElement('div');
-          descBox.className = 'skill-description';
-          if (skill.description_level && skill.description_level.length > 0) {
-            descBox.innerText = skill.description_level[0];
-          } else if (skill.description) {
-            descBox.innerText = skill.description;
-          } else {
-            descBox.innerText = 'Описание отсутствует';
-          }
-
-          li.appendChild(title);
-          li.appendChild(descBox);
-
-          if (skill.description_level && skill.description_level.length > 1 && skill.type !== 'Талант' && skill.type !== 'Техника') {
-            const slider = document.createElement('input');
-            slider.type = 'range';
-            slider.min = 1;
-            slider.max = skill.description_level.length;
-            slider.value = 1;
-            slider.addEventListener('input', () => {
-              descBox.innerText = skill.description_level[slider.value - 1];
-              levelLabel.innerText = `Lv. ${slider.value}`;
-            });
-            li.appendChild(slider);
-          }
-
-          memorySkillsList.appendChild(li);
+      if (data.skills && Array.isArray(data.skills)) {
+        data.skills.forEach(skill => {
+          const skillItem = createSkillItem(skill);
+          skillsList.appendChild(skillItem);
         });
-      } else {
-        console.log('Навыки мемоспрайта отсутствуют или путь не "Память".');
-      }    
+      }
+
+      if (char.path === 'Память' && data.memosprite_skills && Array.isArray(data.memosprite_skills)) {
+        const header = document.createElement('h2');
+        header.innerText = 'Скиллы Мемоспрайта';
+        skillsList.appendChild(header);
+
+        data.memosprite_skills.forEach(skill => {
+          const skillItem = createSkillItem(skill);
+          skillsList.appendChild(skillItem);
+        });
+      }
 
       const tracesList = document.querySelector('.traces-list');
       tracesList.innerHTML = '';

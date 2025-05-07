@@ -1,0 +1,136 @@
+.modal {
+    display: none !important; 
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.characteristics {
+    margin-top: 20px;
+}
+
+.characteristic-option {
+    margin-bottom: 10px;
+}
+
+body {
+    display: flex;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e; 
+    color: #ffffff; 
+    height: 100vh;
+}
+
+
+.left-tabs, .right-tabs {
+    width: 50px;
+    background-color: #333333; 
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+
+.tab-btn {
+    padding: 10px;
+    border: none;
+    background: #555555; 
+    cursor: pointer;
+    text-align: center;
+    color: #ffffff;
+}
+
+.tab-btn img {
+    width: 30px; 
+    height: 30px;
+}
+
+.tab-btn:hover {
+    background-color: #777777; 
+}
+
+
+.left-container, .right-container {
+    flex-grow: 1;
+    padding: 0 20px;
+    background-color: #2b2b2b;
+    width: 50%;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none; 
+}
+
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+
+.stat-name {
+    width: 30%;
+}
+
+.stat-base, .stat-bonus, .stat-total {
+    width: 20%;
+    text-align: right;
+}
+
+
+.content-tab {
+    display: none;
+}
+
+h2 {
+    color: #ffffff;
+}
+
+
+.character-image, .weapon-image {
+    width: 150px;
+    height: 150px;
+    background-color: #444444;
+    margin-bottom: 20px;
+}
+
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.slider-row input[type="number"] {
+    width: 40px;
+    text-align: center;
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+}
+
+.slider-row input[type="range"] {
+    width: 100%;
+}

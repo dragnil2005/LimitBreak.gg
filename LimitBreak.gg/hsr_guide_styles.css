@@ -138,4 +138,14 @@ input[type=range] {
 ul.skills-list {
   margin-bottom: 20px;
 }
-
+.skill-title {
+  position: relative;
+}
+.skill-type {
+  top: 0;
+  right: 0;
+  font-size: 0.8rem;
+  color: #ffffff;
+  font-weight: normal;
+  font-style: normal;
+}

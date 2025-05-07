@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSR Калькулятор - LimitBreak.gg</title>
+  <link rel="stylesheet" href="hsr_calculator_style.css">
+</head>
+<body>
+
+  <!-- Левая таб-панель -->
+  <div class="side-tabs left-tabs">
+    <button class="tab-btn active" data-target="stats-tab" data-side="left" title="Статы">
+      <img src="tab_stats_light.png" alt="Статы">
+    </button>
+    <button class="tab-btn" data-target="result-tab" data-side="left" title="Итог">
+      <img src="tab_share_light.png" alt="Итог">
+    </button>
+  </div>
+
+  <div class="main-content">
+    <div class="panel left-panel">
+      <div id="stats-tab" class="content-tab active">
+        <h2>Тут будет панель статистики...</h2>
+      </div>
+      <div id="result-tab" class="content-tab">
+        <h2>Тут будет итоговый результат...</h2>
+      </div>
+    </div>
+
+    <div class="panel right-panel">
+      <div id="character-tab" class="content-tab active">
+
+        <div class="character-top">
+          <div class="character-title">
+            <h2>Персонаж</h2>
+            <div class="character-tab-icon">
+              <img src="tab_char_light.png" alt="Иконка">
+            </div>
+          </div>
+        </div>
+
+        <div class="character-content">
+          <div class="character-info">
+            <img class="character-image" src="placeholder_character.png" alt="Персонаж">
+            <div class="char-name-block">
+              <div class="char-name">Мавуика</div>
+              <div class="char-stars">★★★★★</div>
+              <div class="char-level">Уровень <span id="level-value">1</span>/80</div>
+            </div>
+          </div>
+
+          <div class="character-settings">
+            <div class="char-setting-row">
+              <span class="char-setting-label">Базовая атака</span>
+              <div class="char-setting-control">
+                <button class="btn-minus" onclick="changeValue('basic-attack', -1)">−</button>
+                <input type="range" id="basic-attack" min="1" max="10" value="1" oninput="updateDisplay('basic-attack')">
+                <button class="btn-plus" onclick="changeValue('basic-attack', 1)">+</button>
+                <span class="char-setting-value" id="basic-attack-display">1</span>
+              </div>
+            </div>
+
+            <div class="char-setting-row">
+              <span class="char-setting-label">Навык</span>
+              <div class="char-setting-control">
+                <button class="btn-minus" onclick="changeValue('skill', -1)">−</button>
+                <input type="range" id="skill" min="1" max="15" value="1" oninput="updateDisplay('skill')">
+                <button class="btn-plus" onclick="changeValue('skill', 1)">+</button>
+                <span class="char-setting-value" id="skill-display">1</span>
+              </div>
+            </div>
+
+            <div class="char-setting-row">
+              <span class="char-setting-label">Сверхспособность</span>
+              <div class="char-setting-control">
+                <button class="btn-minus" onclick="changeValue('ult', -1)">−</button>
+                <input type="range" id="ult" min="1" max="15" value="1" oninput="updateDisplay('ult')">
+                <button class="btn-plus" onclick="changeValue('ult', 1)">+</button>
+                <span class="char-setting-value" id="ult-display">1</span>
+              </div>
+            </div>
+
+            <div class="char-setting-row">
+              <span class="char-setting-label">Эйдолоны</span>
+              <div class="char-setting-control">
+                <button class="btn-minus" onclick="changeValue('eidolon', -1)">−</button>
+                <input type="range" id="eidolon" min="0" max="6" value="0" oninput="updateDisplay('eidolon')">
+                <button class="btn-plus" onclick="changeValue('eidolon', 1)">+</button>
+                <span class="char-setting-value" id="eidolon-display">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div id="lightcone-tab" class="content-tab">
+        <h2>Тут будет контейнер конуса света...</h2>
+      </div>
+      <div id="relics-tab" class="content-tab">
+        <h2>Тут будет контейнер реликвий...</h2>
+      </div>
+      <div id="buffs-tab" class="content-tab">
+        <h2>Тут будет контейнер баффов...</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Правая таб-панель -->
+  <div class="side-tabs right-tabs">
+    <button class="tab-btn active" data-target="character-tab" data-side="right" title="Персонаж">
+      <img src="tab_char_light.png" alt="Персонаж">
+    </button>
+    <button class="tab-btn" data-target="lightcone-tab" data-side="right" title="Конус">
+      <img src="tab_weapon_light.png" alt="Конус">
+    </button>
+    <button class="tab-btn" data-target="relics-tab" data-side="right" title="Реликвии">
+      <img src="tab_artifact_light.png" alt="Реликвии">
+    </button>
+    <button class="tab-btn" data-target="buffs-tab" data-side="right" title="Баффы">
+      <img src="tab_buffs_light.png" alt="Баффы">
+    </button>
+  </div>
+
+  <script src="hsr_calculator_script.js"></script>
+
+</body>
+</html>
