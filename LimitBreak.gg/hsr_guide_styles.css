@@ -1,186 +1,141 @@
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
+  margin: 0;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
   font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
-  line-height: 1.6;
-  padding: 20px;
 }
-
-
 header {
-  background-color: #2980b9;
-  color: white;
-  padding: 20px 0;
-  position: relative;
+  width: 100%;
+  padding: 15px 20px;
+  background: linear-gradient(145deg, #0f0f3d, #1a1a2e);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
-
-header .container {
-  width: 80%;
+header a {
+  text-decoration: none;
+  color: #00d4ff;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.content {
+  padding: 20px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+h1, h2 {
   text-align: center;
 }
-
-header h1 {
-  font-size: 3rem;
-  margin: 0;
+h1 {
+  font-size: 2.8rem;
+  margin: 0.3em 0 0.2em;
 }
-
-header h2 {
-  font-size: 0.8rem;
-  color: #ecf0f1;
-}
-
-
-.character-card {
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+h2 {
+  color: #7a6bff;
   margin-top: 30px;
+  text-shadow: 0 0 6px rgba(122, 107, 255, 0.4);
 }
-
-.character-card img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-right: 20px;
+.char-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-color: #2c2c4a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
 }
-
-.character-info {
-  max-width: 500px;
+.char-header img {
+  max-width: 200px;
+  border-radius: 12px;
 }
-
-.character-info h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #2c3e50;
+.char-details {
+  flex: none;
 }
-
-.character-info p {
-  font-size: 1.2rem;
-  color: #7f8c8d;
-  margin: 5px 0;
+.char-name {
+  font-size: 2.2rem;
+  margin: 0 0 10px 0;
 }
-
-
+.char-meta {
+  font-size: 1.1rem;
+}
+.char-meta div {
+  margin-bottom: 8px;
+}
+.char-meta img {
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
 table {
   width: 100%;
-  margin-top: 20px;
   border-collapse: collapse;
+  margin-bottom: 20px;
 }
-
-table th, table td {
+th {
+  background-color: #2c2c4a;
+  color: #ffffff;
+}
+th, td {
   padding: 10px;
+  border: 1px solid #4e3e7a;
   text-align: center;
-  border: 1px solid #ddd;
 }
-
-table th {
-  background-color: #ecf0f1;
-  font-size: 1.1rem;
-}
-
-table td {
-  font-size: 1rem;
-}
-
-
-h2 {
-  font-size: 2rem;
-  margin-top: 30px;
-  color: #2980b9;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
 ul {
-  list-style-type: none;
-  margin-top: 10px;
+  list-style: none;
   padding-left: 0;
 }
-
-ul li {
-  font-size: 1.1rem;
-  padding: 8px;
-  margin-bottom: 8px;
-  background-color: #f9fafb;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+li.skill-item, li.trace-item, li.eidolon-item, li.upgrade-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #2c2c4a;
+  color: #eaeaea;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+li.skill-item:hover, li.trace-item:hover, li.eidolon-item:hover, li.upgrade-item:hover {
+  background-color: #3a3a5a;
+}
+input[type=range] {
+  width: 100%;
+  margin-top: 10px;
+}
+.trace-lvl,
+.upgrade-lvl {
+  color: #a07aff; 
+  font-weight: bold;
+  margin-right: 8px;
+}
+.skill-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-ul li:hover {
-  background-color: #ecf0f1;
+.skill-name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-
-button {
-  background-color: #2980b9;
-  color: #fff;
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+.skill-lv {
+  font-weight: bold;
+  color: #7a6bff;
+}
+.skill-name,
+.trace-name,
+.eidolon-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 16px;
+}
+ul.skills-list {
+  margin-bottom: 20px;
 }
 
-button:hover {
-  background-color: #3498db;
-}
-
-button:active {
-  background-color: #2980b9;
-}
-
-
-@media (max-width: 768px) {
-  .character-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .character-card img {
-    width: 150px;
-    height: 150px;
-  }
-
-  .character-info {
-    max-width: none;
-  }
-
-  header h1 {
-    font-size: 2rem;
-  }
-
-  header h2 {
-    font-size: 1rem;
-  }
-
-  table {
-    font-size: 0.9rem;
-  }
-
-  ul li {
-    font-size: 1rem;
-  }
-
-  button {
-    padding: 8px 16px;
-  }
-}

@@ -3,86 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Персонаж</title>
-  <link rel="stylesheet" href="hsr_guide_styles.css">
+  <title>Гайд по персонажу - LimitBreak.gg</title>
+  <link rel="stylesheet" href="hsr_guide_styles.css"></link>
 </head>
 <body>
-
   <header>
-    <div class="container">
-      <h1>Персонажи HSR</h1>
-      <h2>Live updated for 2.7. Audio added Beta semi-updated for 2.8.51. Vids added. Servants Added.</h2>
-    </div>
+    <a href="mainLobi.html">LimitBreak.gg</a>
   </header>
 
-  <div class="container">
-    <div class="character-card">
-      <img id="character-image" src="" alt="Character Image" />
-
-      <div class="character-info">
-        <h1 id="character-name"></h1>
-        <p class="rarity">Редкость: <span id="rarity"></span></p>
-        <p class="path">Путь: <span id="path"></span></p>
-        <p class="element">Элемент: <span id="element"></span></p>
+  <div class="content">
+    <div class="char-header">
+      <img id="character-image" alt="Персонаж">
+      <div class="char-details">
+        <div class="char-name" id="character-name">Имя персонажа</div>
+        <div class="char-meta">
+          <div><strong>Редкость:</strong> ★<span id="rarity"></span></div>
+          <div><strong>Путь:</strong> <img id="path-icon" alt="Путь"><span id="path-name"></span></div>
+          <div><strong>Тип урона:</strong> <img id="element-icon" alt="Элемент"><span id="element-name"></span></div>
+        </div>
       </div>
     </div>
 
-    <h2>Базовые характеристики</h2>
+    <h2>СТАТИСТИКА</h2>
     <table class="stats-table">
       <thead>
         <tr>
-          <th>Уровень</th>
-          <th>Сила атаки</th>
-          <th>Защита</th>
-          <th>НР</th>
-          <th>Скорость</th>
-          <th>Крит. шанс</th>
-          <th>Крит. урон</th>
-          <th>Энергия</th>
+          <th>Уровень</th><th>АТК</th><th>ЗАЩ</th><th>HP</th><th>Скорость</th><th>Крит. шанс</th><th>Крит. урон</th><th>Энергия</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- JS добавление уровней -->
-      </tbody>
+      <tbody></tbody>
     </table>
 
-    <h2>Навыки</h2>
-    <ul class="skills-list">
-    </ul>
-    <h2>Следы</h2>
-    <ul class="traces-list">
-    </ul>
+    <h2>НАВЫКИ</h2>
+    <ul class="skills-list"></ul>
 
-    <h2>Эйдолоны</h2>
-    <ul class="eidolons-list">
-    </ul>
+    <h2>СЛЕДЫ</h2>
+    <ul class="traces-list"></ul>
+
+    <h2>УЛУЧШЕНИЯ</h2>
+    <ul class="upgrades-list"></ul>
+
+    <h2>ЭЙДОЛОНЫ</h2>
+    <ul class="eidolons-list"></ul>
   </div>
 
-  <footer>
-    <div class="container">
-      <p>&copy; Персонажи HSR.</p>
-    </div>
-  </footer>
-
-  <script>
-    // Получаем id из URL
-    const params = new URLSearchParams(window.location.search);
-    const characterId = params.get('id');
-
-    // Делаем запрос к PHP-скрипту на сервере OpenServer
-    fetch(`get_HSRcharacters_for_guide.php?id=${characterId}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data); // Тут твои данные из базы
-
-        // Выводим данные на страницу
-        document.getElementById('character-name').innerText = data.character.name;
-        // И так далее для других полей
-    })
-    .catch(error => {
-      console.error('Ошибка загрузки:', error);
-    });
-  </script>
+  <script src="hsr_guide_script.js"></script>
 </body>
 </html>

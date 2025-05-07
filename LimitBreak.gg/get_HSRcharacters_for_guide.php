@@ -1,260 +1,518 @@
 <?php
+
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ob_clean();
 
-// подключение к БД
 $mysqli = new mysqli("127.127.126.5", "root", "", "hsr_characters_bd");
 
-// проверка подключения
 if ($mysqli->connect_error) {
-    die("Ошибка подключения: " . $mysqli->connect_error);
+    http_response_code(500);
+    die(json_encode(['error' => "Ошибка подключения: " . $mysqli->connect_error]));
 }
 
-// получаем id из GET
 $characterId = intval($_GET['id']);
-
-// получаем данные персонажа
 $characterResult = $mysqli->query("SELECT * FROM characters WHERE id = $characterId");
+
 if ($characterResult->num_rows === 0) {
     http_response_code(404);
     echo json_encode(['error' => 'Персонаж не найден']);
     exit;
 }
+
 $character = $characterResult->fetch_assoc();
 
-// получаем статистику персонажа для всех уровней
+// Получаем статистику
 $statsResult = $mysqli->query("SELECT * FROM character_stats WHERE character_id = $characterId");
 $stats = $statsResult->fetch_all(MYSQLI_ASSOC);
 
-// получаем скиллы персонажа
-$skillsResult = $mysqli->query("SELECT * FROM character_skills WHERE character_id = $characterId");
-$skills = [];
+// Получаем скиллы
+$characterSkillsResult = $mysqli->query("SELECT * FROM character_skills WHERE character_id = $characterId");
+$characterSkills = [];
 
-while ($skill = $skillsResult->fetch_assoc()) {
-    // проверяем флаги скиллов
+while ($skill = $characterSkillsResult->fetch_assoc()) {
     $skillId = $skill['id'];
 
-    $skill['is_dmg'] = (bool)$skill['is_dmg'];
-
-        // если это боевой скилл
+    // DMG
+    $dmgLevels = [];
     if ($skill['is_dmg']) {
         $dmgLevelsQuery = $mysqli->prepare("SELECT * FROM character_skills_dmg_level WHERE skill_id = ?");
-        $dmgLevelsQuery->bind_param("i", $skill['id']);
+        $dmgLevelsQuery->bind_param("i", $skillId);
         $dmgLevelsQuery->execute();
         $dmgLevelsResult = $dmgLevelsQuery->get_result();
 
-        $dmgLevels = [];
-
         while ($level = $dmgLevelsResult->fetch_assoc()) {
-            // Подставляем значения в описание
             $level['description'] = str_replace(
                 ["X_DMG", "Y_DMG"],
-                [$level['dmg_percent_main'], $level['dmg_percent_secondary']],
+                [ (string)$level['dmg_percent_main'], (string)$level['dmg_percent_secondary'] ],
                 $skill['description']
             );
-
-            // Собираем нужные параметры в массив
-            $dmgLevels[] = [
-                'level'                      => $level['level'],
-                'description'                => $level['description'],
-                'target_type'                => $level['target_type'],
-                'weakness_break_value_main'  => $level['weakness_break_value_main'],
-                'weakness_break_value_secondary' => $level['weakness_break_value_secondary'],
-                'dmg_percent_main'           => $level['dmg_percent_main'],
-                'dmg_percent_secondary'      => $level['dmg_percent_secondary'],
-                'dmg_info'                   => $level['dmg_info']
-            ];
+            $dmgLevels[] = $level;
         }
-
-        // Добавляем dmg_levels в скилл
         $skill['dmg_levels'] = $dmgLevels;
-
-            // Добавляем скилл в массив персонажа
-        $character['character_skills'][] = [
-            'id'              => $skill['id'],
-            'character_id'    => $skill['character_id'],
-            'name'            => $skill['name'],
-            'type'            => $skill['type'],
-            'energy_restore'  => $skill['energy_restore'],
-            'dmg_levels'      => $skill['is_dmg'] ? $skill['dmg_levels'] : null
-        ];
     }
 
-    if ($skill['is_repeat_dmg'] === 'true') {
-        $repeatDmgResult = $mysqli->query("SELECT * FROM character_skills_repeat_dmg_level WHERE skill_id = $skillId");
-        $repeatDmgLevels = $repeatDmgResult->fetch_all(MYSQLI_ASSOC);
-        
-        // Создаем копию оригинального описания для замены
-        $modifiedDescription = $skill['description'];
-        
-        foreach ($repeatDmgLevels as $level) {
-            // Определяем значение для замены
-            $replaceValue = str_contains($level['hit_order'], 'main') 
-                ? $level['dmg_percent_main'] 
-                : $level['dmg_percent_secondary'];
-            
-            // Заменяем плейсхолдер в описании
-            $modifiedDescription = str_replace(
-                $level['hit_order'],
-                $replaceValue,
-                $modifiedDescription
-            );
+    // Repeat DMG
+    $repeatDmgLevels = [];
+    $descriptionTemplate = $skill['description'];
+    if ($skill['is_repeat_dmg']) {
+        $repeatDmgQuery = $mysqli->prepare("SELECT * FROM character_skills_repeat_dmg_level WHERE skill_id = ?");
+        $repeatDmgQuery->bind_param("i", $skillId);
+        $repeatDmgQuery->execute();
+        $repeatDmgResult = $repeatDmgQuery->get_result();
+
+        while ($row = $repeatDmgResult->fetch_assoc()) {
+            $repeatDmgLevels[] = $row;
         }
-        
-        // Сохраняем модифицированное описание
-        $skill['description'] = $modifiedDescription;
-        $skill['repeat_dmg_levels'] = $repeatDmgLevels;
     }
 
-    if ($skill['is_rebound_dmg'] == 'true') {
-        $dmgResult = $mysqli->query("SELECT * FROM character_skills_rebound_dmg_level WHERE skill_id = " . $skill['id']);
-        $skill['rebound_dmg_levels'] = $dmgResult->fetch_all(MYSQLI_ASSOC);
+    // Rebound DMG
+    $reboundDmgLevels = [];
+    if ($skill['is_rebound_dmg']) {
+        $reboundDmgQuery = $mysqli->prepare("SELECT * FROM character_skills_rebound_dmg_level WHERE skill_id = ?");
+        $reboundDmgQuery->bind_param("i", $skillId);
+        $reboundDmgQuery->execute();
+        $reboundDmgResult = $reboundDmgQuery->get_result();
+
+        while ($level = $reboundDmgResult->fetch_assoc()) {
+            $level['description'] = str_replace(
+                ["X_REBOUND_DMG_MAIN", "X_REBOUND_DMG_SECONDARY"],
+                [(string)$level['dmg_percent_main'], (string)$level['dmg_percent_secondary']],
+                $skill['description']
+            );
+            $reboundDmgLevels[] = $level;
+        }
+        $skill['rebound_dmg_levels'] = $reboundDmgLevels;
     }
 
-    if ($skill['is_buff'] == 'true') {
-        // Логика для получения баффов (пример, можно добавить запросы в соответствующие таблицы)
-        $buffResult = $mysqli->query("SELECT * FROM character_skills_buff_level WHERE skill_id = " . $skill['id']);
-        $skill['buff_levels'] = $buffResult->fetch_all(MYSQLI_ASSOC);
+    // Buff
+    $buffLevels = [];
+    if ($skill['is_buff']) {
+        $buffLevelsQuery = $mysqli->prepare("SELECT * FROM character_skills_buff_level WHERE skill_id = ?");
+        $buffLevelsQuery->bind_param("i", $skillId);
+        $buffLevelsQuery->execute();
+        $buffLevelsResult = $buffLevelsQuery->get_result();
+
+        while ($level = $buffLevelsResult->fetch_assoc()) {
+            $level['description'] = str_replace(
+                ["X_BUFF", "X_BUFF_PER_STACK"],
+                [$level['buff_value'], $level['buff_increase_per_stack']],
+                $skill['description']
+            );
+            $buffLevels[] = $level;
+        }
+        $skill['buff_levels'] = $buffLevels;
     }
 
-    if ($skill['is_debuff'] == 'true') {
-        $debuffResult = $mysqli->query("SELECT * FROM character_skills_debuff_level WHERE skill_id = " . $skill['id']);
-        $skill['debuff_levels'] = $debuffResult->fetch_all(MYSQLI_ASSOC);
+    // Debuff
+    $debuffLevels = [];
+    if ($skill['is_debuff']) {
+        $debuffLevelsQuery = $mysqli->prepare("SELECT * FROM character_skills_debuff_level WHERE skill_id = ?");
+        $debuffLevelsQuery->bind_param("i", $skillId);
+        $debuffLevelsQuery->execute();
+        $debuffLevelsResult = $debuffLevelsQuery->get_result();
+
+        while ($level = $debuffLevelsResult->fetch_assoc()) {
+            $level['description'] = str_replace(
+                ["X_DEBUFF", "X_DEBUFF_PER_STACK"],
+                [$level['debuff_value'], $level['debuff_increase_per_stack']],
+                $skill['description']
+            );
+            $debuffLevels[] = $level;
+        }
+        $skill['debuff_levels'] = $debuffLevels;
     }
 
-    if ($skill['is_heal'] == 'true') {
-        $healResult = $mysqli->query("SELECT * FROM character_skills_heal_level WHERE skill_id = " . $skill['id']);
-        $skill['heal_levels'] = $healResult->fetch_all(MYSQLI_ASSOC);
+    // Heal
+    $healLevels = [];
+    if ($skill['is_heal']) {
+        $healLevelsQuery = $mysqli->prepare("SELECT * FROM character_skills_heal_level WHERE skill_id = ?");
+        $healLevelsQuery->bind_param("i", $skillId);
+        $healLevelsQuery->execute();
+        $healLevelsResult = $healLevelsQuery->get_result();
+
+        while ($level = $healLevelsResult->fetch_assoc()) {
+            $level['description'] = str_replace(
+                ["X_HEAL_PERSENT_MAIN", "X_HEAL_FLAT_MAIN", "X_HEAL_PERSENT_SECONDARY", "X_HEAL_FLAT_SECONDARY"],
+                [$level['heal_percent_main'], $level['heal_flat_main'], $level['heal_percent_secondary'], $level['heal_flat_secondary']],
+                $skill['description']
+            );
+            $healLevels[] = $level;
+        }
+        $skill['heal_levels'] = $healLevels;
     }
 
-    if ($skill['is_shield'] == 'true') {
-        $shieldResult = $mysqli->query("SELECT * FROM character_skills_shield_level WHERE skill_id = " . $skill['id']);
-        $skill['shield_levels'] = $shieldResult->fetch_all(MYSQLI_ASSOC);
+    // Shield
+    $shieldLevels = [];
+    if ($skill['is_shield']) {
+        $shieldLevelsQuery = $mysqli->prepare("SELECT * FROM character_skills_shield_level WHERE skill_id = ?");
+        $shieldLevelsQuery->bind_param("i", $skillId);
+        $shieldLevelsQuery->execute();
+        $shieldLevelsResult = $shieldLevelsQuery->get_result();
+
+        while ($level = $shieldLevelsResult->fetch_assoc()) {
+            $level['description'] = str_replace(
+                ["X_SHIELD_PERCENT", "X_SHIELD_INCREASE_PER_STACK"],
+                [(string)$level['shield_percent'], (string)$level['shield_increase_per_stack']],
+                $skill['description']
+            );
+            $shieldLevels[] = $level;
+        }
+        $skill['shield_levels'] = $shieldLevels;
     }
-    $skills[] = $skill;
+
+    // Общая обработка description_level
+    $combinedLevels = array_merge($dmgLevels, $repeatDmgLevels, $buffLevels, $debuffLevels, $healLevels, $reboundDmgLevels, $shieldLevels);
+    $maxLevel = 0;
+    foreach ($combinedLevels as $row) {
+        if ($row['level'] > $maxLevel) {
+            $maxLevel = $row['level'];
+        }
+    }
+
+    $allDescriptions = [];
+    for ($i = 1; $i <= $maxLevel; $i++) {
+        $replaceMap = [];
+
+        foreach ($dmgLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_DMG"] = (string)$row['dmg_percent_main'];
+                $replaceMap["Y_DMG"] = (string)$row['dmg_percent_secondary'];
+            }
+        }
+
+        foreach ($repeatDmgLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["{$row['hit_order']}_main"] = $row['dmg_percent_main'];
+                $replaceMap["{$row['hit_order']}_secondary"] = $row['dmg_percent_secondary'];
+            }
+        }
+
+        foreach ($reboundDmgLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_REBOUND_DMG_MAIN"] = (string)$row['dmg_percent_main'];
+                $replaceMap["X_REBOUND_DMG_SECONDARY"] = (string)$row['dmg_percent_secondary'];
+            }
+        }
+
+        foreach ($shieldLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_SHIELD_PERCENT"] = (string)$row['shield_percent'];
+                $replaceMap["X_SHIELD_INCREASE_PER_STACK"] = (string)$row['shield_increase_per_stack'];
+            }
+        }
+
+        foreach ($buffLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_BUFF"] = $row['buff_value'];
+                $replaceMap["X_BUFF_PER_STACK"] = $row['buff_increase_per_stack'];
+            }
+        }
+
+        foreach ($debuffLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_DEBUFF"] = $row['debuff_value'];
+                $replaceMap["X_DEBUFF_PER_STACK"] = $row['debuff_increase_per_stack'];
+            }
+        }
+
+        foreach ($healLevels as $row) {
+            if ($row['level'] == $i) {
+                $replaceMap["X_HEAL_PERSENT_MAIN"] = $row['heal_percent_main'];
+                $replaceMap["X_HEAL_FLAT_MAIN"] = $row['heal_flat_main'];
+                $replaceMap["X_HEAL_PERSENT_SECONDARY"] = $row['heal_percent_secondary'];
+                $replaceMap["X_HEAL_FLAT_SECONDARY"] = $row['heal_flat_secondary'];
+            }
+        }
+
+        $levelDescription = $descriptionTemplate;
+
+        foreach ($replaceMap as $key => &$value) {
+            if ($value === null) {
+                $value = 0;
+            }
+        }
+        unset($value);
+
+        foreach ($replaceMap as $key => $value) {
+            $levelDescription = str_replace($key, $value, $levelDescription);
+        }
+
+        $allDescriptions[] = $levelDescription;
+
+    }
+
+    $skill['description_level'] = $allDescriptions;
+    $characterSkills[] = $skill;
 }
 
-//получаем следы 
+// Получаем traces
 $tracesResult = $mysqli->query("SELECT * FROM character_traces WHERE character_id = $characterId");
 $traces = $tracesResult->fetch_all(MYSQLI_ASSOC);
 
-//получаем апгрэйды
+// Получаем upgrades
 $upgradesResult = $mysqli->query("SELECT * FROM character_upgrades WHERE character_id = $characterId");
 $upgrades = $upgradesResult->fetch_all(MYSQLI_ASSOC);
 
-if ($character['path'] === 'Память') {
+// Финальный вывод
+$response = [
+    'character' => $character,
+    'stats' => $stats,
+    'skills' => $characterSkills,
+    'traces' => $traces,
+    'upgrades' => $upgrades
+];
 
-    //получаем мема
-    $memoResult = $mysqli->query("SELECT * FROM memosprite_stats WHERE character_id = $characterId");
-    $memoStats = $memoResult->fetch_all(MYSQLI_ASSOC);
+
+// Обработка мемоспрайта, если путь — Память
+if ($character['path'] === 'Память') {
+    // Получаем статистику
+    $memospriteStatsResult = $mysqli->query("SELECT * FROM memosprite_stats WHERE character_id = $characterId");
+    $memospriteStats = $memospriteStatsResult->fetch_assoc();
+
+    $characterStatsResult = $mysqli->query("SELECT * FROM character_stats WHERE character_id = $characterId");
+    $characterStatsList = [];
+    while ($row = $characterStatsResult->fetch_assoc()) {
+        $characterStatsList[$row['level']] = $row;
+    }
 
     $memospriteFinalStats = [];
 
-    foreach ($stats as $statRow) {
-        foreach ($memoStats as $memoRow) {
-            $memospriteFinalStats[] = [
-                'level' => $statRow['level'],
-                'hp' => ($statRow['hp'] * ($memoRow['hp_percent'] / 100)) + $memoRow['hp_flat'],
-                'atk' => ($statRow['atk'] * ($memoRow['atk_percent'] / 100)) + $memoRow['atk_flat'],
-                'def' => ($statRow['def'] * ($memoRow['def_percent'] / 100)) + $memoRow['def_flat'],
-                'speed' => ($statRow['speed'] * ($memoRow['speed_percent'] / 100)) + $memoRow['speed_flat'],
-                'crit_rate' => ($statRow['crit_rate'] * ($memoRow['crit_rate'] / 100)),
-                'crit_dmg' => ($statRow['crit_dmg'] * ($memoRow['crit_dmg'] / 100))
-            ];
-        }
-    }
+    foreach ($characterStatsList as $level => $characterStats) {
+        $memospriteFinalStats[$level] = [
+            'hp' => (float)$characterStats['hp'] * ((float)$memospriteStats['hp_percent'] / 100) + (float)$memospriteStats['hp_flat'],
+            'atk' => (float)$characterStats['atk'] * ((float)$memospriteStats['atk_percent'] / 100) + (float)$memospriteStats['atk_flat'],
+            'def' => (float)$characterStats['def'] * ((float)$memospriteStats['def_percent'] / 100) + (float)$memospriteStats['def_flat'],
+            'speed' => (float)$characterStats['speed'] * ((float)$memospriteStats['speed_percent'] / 100) + (float)$memospriteStats['speed_flat'],
+            'crit_rate' => (float)$characterStats['crit_rate'],
+            'crit_dmg' => (float)$characterStats['crit_dmg']
+        ];
 
-    // Забираем мемоспрайт скиллы
+    }
+    $response['memosprite_stats'] = $memospriteFinalStats;
+
+    // Получаем скиллы
     $memospriteSkillsResult = $mysqli->query("SELECT * FROM memosprite_skills WHERE character_id = $characterId");
     $memospriteSkills = [];
 
     while ($skill = $memospriteSkillsResult->fetch_assoc()) {
         $skillId = $skill['id'];
 
-        if ($skill['is_dmg'] === 'true') {
-            $dmgResult = $mysqli->query("SELECT * FROM memosprite_skills_dmg_level WHERE skill_id = $skillId");
-            $skill['dmg_levels'] = $dmgResult->fetch_all(MYSQLI_ASSOC);
-            foreach ($dmgLevels as &$level) {
+        $dmgLevels = [];
+        if ($skill['is_dmg']) {
+            $query = $mysqli->prepare("SELECT * FROM memosprite_skills_dmg_level WHERE skill_id = ?");
+            $query->bind_param("i", $skillId);
+            $query->execute();
+            $result = $query->get_result();
+            while ($level = $result->fetch_assoc()) {
                 $level['description'] = str_replace(
                     ["X_DMG", "Y_DMG"],
-                    [$level['dmg_percent_main'], $level['dmg_percent_secondary']],
+                    [(string)$level['dmg_percent_main'], (string)$level['dmg_percent_secondary']],
                     $skill['description']
                 );
+                $dmgLevels[] = $level;
             }
             $skill['dmg_levels'] = $dmgLevels;
         }
 
-        if ($skill['is_repeat_dmg'] === 'true') {
-            $repeatDmgResult = $mysqli->query("SELECT * FROM memosprite_skills_repeat_dmg_level WHERE skill_id = $skillId");
-            $repeatDmgLevels = $repeatDmgResult->fetch_all(MYSQLI_ASSOC);
-            
-            // Создаем копию оригинального описания для замены
-            $modifiedDescription = $skill['description'];
-            
-            foreach ($repeatDmgLevels as $level) {
-                // Определяем значение для замены
-                $replaceValue = str_contains($level['hit_order'], 'main') 
-                    ? $level['dmg_percent_main'] 
-                    : $level['dmg_percent_secondary'];
-                
-                // Заменяем плейсхолдер в описании
-                $modifiedDescription = str_replace(
-                    $level['hit_order'],
-                    $replaceValue,
-                    $modifiedDescription
-                );
+        // Repeat DMG
+        $repeatDmgLevels = [];
+        $descriptionTemplate = $skill['description'];
+        if ($skill['is_repeat_dmg']) {
+            $repeatDmgQuery = $mysqli->prepare("SELECT * FROM memosprite_skills_repeat_dmg_level WHERE skill_id = ?");
+            $repeatDmgQuery->bind_param("i", $skillId);
+            $repeatDmgQuery->execute();
+            $repeatDmgResult = $repeatDmgQuery->get_result();
+
+            while ($row = $repeatDmgResult->fetch_assoc()) {
+                $repeatDmgLevels[] = $row;
             }
-            
-            // Сохраняем модифицированное описание
-            $skill['description'] = $modifiedDescription;
-            $skill['repeat_dmg_levels'] = $repeatDmgLevels;
         }
 
-        if ($skill['is_buff'] === 'true') {
-            $buffResult = $mysqli->query("SELECT * FROM memosprite_skills_buff_level WHERE skill_id = $skillId");
-            $skill['buff_levels'] = $buffResult->fetch_all(MYSQLI_ASSOC);
+        $reboundDmgLevels = [];
+        if ($skill['is_rebound_dmg']) {
+            $query = $mysqli->prepare("SELECT * FROM memosprite_skills_rebound_dmg_level WHERE skill_id = ?");
+            $query->bind_param("i", $skillId);
+            $query->execute();
+            $result = $query->get_result();
+            while ($level = $result->fetch_assoc()) {
+                $level['description'] = str_replace(
+                    ["X_REBOUND_DMG_MAIN", "X_REBOUND_DMG_SECONDARY"],
+                    [(string)$level['dmg_percent_main'], (string)$level['dmg_percent_secondary']],
+                    $skill['description']
+                );
+                $reboundDmgLevels[] = $level;
+            }
+            $skill['rebound_dmg_levels'] = $reboundDmgLevels;
         }
 
-        if ($skill['is_debuff'] === 'true') {
-            $debuffResult = $mysqli->query("SELECT * FROM memosprite_skills_debuff_level WHERE skill_id = $skillId");
-            $skill['debuff_levels'] = $debuffResult->fetch_all(MYSQLI_ASSOC);
+        $shieldLevels = [];
+        if ($skill['is_shield']) {
+            $query = $mysqli->prepare("SELECT * FROM memosprite_skills_shield_level WHERE skill_id = ?");
+            $query->bind_param("i", $skillId);
+            $query->execute();
+            $result = $query->get_result();
+            while ($level = $result->fetch_assoc()) {
+                $level['description'] = str_replace(
+                    ["X_SHIELD_PERCENT", "X_SHIELD_INCREASE_PER_STACK"],
+                    [(string)$level['shield_percent'], (string)$level['shield_increase_per_stack']],
+                    $skill['description']
+                );
+                $shieldLevels[] = $level;
+            }
+            $skill['shield_levels'] = $shieldLevels;
         }
 
-        if ($skill['is_heal'] === 'true') {
-            $healResult = $mysqli->query("SELECT * FROM memosprite_skills_heal_level WHERE skill_id = $skillId");
-            $skill['heal_levels'] = $healResult->fetch_all(MYSQLI_ASSOC);
+        // Buff
+        $buffLevels = [];
+        if ($skill['is_buff']) {
+            $buffLevelsQuery = $mysqli->prepare("SELECT * FROM memosprite_skills_buff_level WHERE skill_id = ?");
+            $buffLevelsQuery->bind_param("i", $skillId);
+            $buffLevelsQuery->execute();
+            $buffLevelsResult = $buffLevelsQuery->get_result();
+
+            while ($level = $buffLevelsResult->fetch_assoc()) {
+                $level['description'] = str_replace(
+                    ["X_BUFF", "X_BUFF_PER_STACK"],
+                    [$level['buff_value'], $level['buff_increase_per_stack']],
+                    $skill['description']
+                );
+                $buffLevels[] = $level;
+            }
+            $skill['buff_levels'] = $buffLevels;
         }
 
-        if ($skill['is_shield'] === 'true') {
-            $shieldResult = $mysqli->query("SELECT * FROM memosprite_skills_shield_level WHERE skill_id = $skillId");
-            $skill['shield_levels'] = $shieldResult->fetch_all(MYSQLI_ASSOC);
+        // Debuff
+        $debuffLevels = [];
+        if ($skill['is_debuff']) {
+            $debuffLevelsQuery = $mysqli->prepare("SELECT * FROM memosprite_skills_debuff_level WHERE skill_id = ?");
+            $debuffLevelsQuery->bind_param("i", $skillId);
+            $debuffLevelsQuery->execute();
+            $debuffLevelsResult = $debuffLevelsQuery->get_result();
+
+            while ($level = $debuffLevelsResult->fetch_assoc()) {
+                $level['description'] = str_replace(
+                    ["X_DEBUFF", "X_DEBUFF_PER_STACK"],
+                    [$level['debuff_value'], $level['debuff_increase_per_stack']],
+                    $skill['description']
+                );
+                $debuffLevels[] = $level;
+            }
+            $skill['debuff_levels'] = $debuffLevels;
         }
 
-        if ($skill['is_rebound_dmg'] === 'true') {
-            $reboundResult = $mysqli->query("SELECT * FROM memosprite_skills_rebound_dmg_level WHERE skill_id = $skillId");
-            $skill['rebound_dmg_levels'] = $reboundResult->fetch_all(MYSQLI_ASSOC);
+        // Heal
+        $healLevels = [];
+        if ($skill['is_heal']) {
+            $healLevelsQuery = $mysqli->prepare("SELECT * FROM memosprite_skills_heal_level WHERE skill_id = ?");
+            $healLevelsQuery->bind_param("i", $skillId);
+            $healLevelsQuery->execute();
+            $healLevelsResult = $healLevelsQuery->get_result();
+
+            while ($level = $healLevelsResult->fetch_assoc()) {
+                $level['description'] = str_replace(
+                    ["X_HEAL_PERSENT_MAIN", "X_HEAL_FLAT_MAIN", "X_HEAL_PERSENT_SECONDARY", "X_HEAL_FLAT_SECONDARY"],
+                    [$level['heal_percent_main'], $level['heal_flat_main'], $level['heal_percent_secondary'], $level['heal_flat_secondary']],
+                    $skill['description']
+                );
+                $healLevels[] = $level;
+            }
+            $skill['heal_levels'] = $healLevels;
         }
 
+        $combinedLevels = array_merge($dmgLevels, $repeatDmgLevels, $buffLevels, $debuffLevels, $healLevels, $reboundDmgLevels, $shieldLevels);
+        $maxLevel = 0;
+        foreach ($combinedLevels as $row) {
+            if ($row['level'] > $maxLevel) {
+                $maxLevel = $row['level'];
+            }
+        }
+
+        $allDescriptions = [];
+        for ($i = 1; $i <= $maxLevel; $i++) {
+            $replaceMap = [];
+
+            foreach ($dmgLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_DMG"] = (string)$row['dmg_percent_main'];
+                    $replaceMap["Y_DMG"] = (string)$row['dmg_percent_secondary'];
+                }
+            }
+
+            foreach ($repeatDmgLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["{$row['hit_order']}_main"] = $row['dmg_percent_main'];
+                    $replaceMap["{$row['hit_order']}_secondary"] = $row['dmg_percent_secondary'];
+                }
+            }
+
+            foreach ($reboundDmgLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_REBOUND_DMG_MAIN"] = (string)$row['dmg_percent_main'];
+                    $replaceMap["X_REBOUND_DMG_SECONDARY"] = (string)$row['dmg_percent_secondary'];
+                }
+            }
+
+            foreach ($shieldLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_SHIELD_PERCENT"] = (string)$row['shield_percent'];
+                    $replaceMap["X_SHIELD_INCREASE_PER_STACK"] = (string)$row['shield_increase_per_stack'];
+                }
+            }
+
+            foreach ($buffLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_BUFF"] = $row['buff_value'];
+                    $replaceMap["X_BUFF_PER_STACK"] = $row['buff_increase_per_stack'];
+                }
+            }
+
+            foreach ($debuffLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_DEBUFF"] = $row['debuff_value'];
+                    $replaceMap["X_DEBUFF_PER_STACK"] = $row['debuff_increase_per_stack'];
+                }
+            }
+
+            foreach ($healLevels as $row) {
+                if ($row['level'] == $i) {
+                    $replaceMap["X_HEAL_PERSENT_MAIN"] = $row['heal_percent_main'];
+                    $replaceMap["X_HEAL_FLAT_MAIN"] = $row['heal_flat_main'];
+                    $replaceMap["X_HEAL_PERSENT_SECONDARY"] = $row['heal_percent_secondary'];
+                    $replaceMap["X_HEAL_FLAT_SECONDARY"] = $row['heal_flat_secondary'];
+                }
+            }
+
+            $levelDescription = $skill['description'];
+
+            foreach ($replaceMap as $key => &$value) {
+                if ($value === null) {
+                    $value = 0;
+                }
+            }
+            unset($value);
+
+            foreach ($replaceMap as $key => $value) {
+                $levelDescription = str_replace($key, $value, $levelDescription);
+            }
+
+            $allDescriptions[] = $levelDescription;
+        }
+
+        $skill['description_level'] = $allDescriptions;
         $memospriteSkills[] = $skill;
     }
-}
 
-// Формируем результат
-$response = [
-    'character' => $character,
-    'stats' => $stats,
-    'traces' => $traces,
-    'upgrades' => $upgrades
-];
-
-// Если path = 'Память' — добавляем memosprite_stats
-if ($character['path'] === 'Память') {
     $response['memosprite_stats'] = $memospriteFinalStats;
     $response['memosprite_skills'] = $memospriteSkills;
 }
 
-echo json_encode($response);
-$mysqli->close();
+// Получаем eidolons
+$eidolonsResult = $mysqli->query("SELECT * FROM character_eidolons WHERE character_id = $characterId");
+$eidolons = $eidolonsResult->fetch_all(MYSQLI_ASSOC);
+$response['eidolons'] = $eidolons;
+
+echo json_encode($response, JSON_UNESCAPED_UNICODE);
+
 ?>
