@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HSR Калькулятор - LimitBreak.gg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HSR Калькулятор — LimitBreak.gg</title>
   <link rel="stylesheet" href="hsr_calculator_style.css">
 </head>
 <body>
@@ -18,90 +18,176 @@
     </button>
   </div>
 
+  <!-- Основной контент -->
   <div class="main-content">
+
+    <!-- Левая панель -->
     <div class="panel left-panel">
+      <!-- Статы -->
       <div id="stats-tab" class="content-tab active">
-        <h2>Тут будет панель статистики...</h2>
+        <div class="stats-panel">
+          <h3>Статистика</h3>
+          <table class="stats-table" id="stats-table">
+            <thead>
+              <tr><th>Показатель</th><th>Значение</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="stats-loading" id="stats-loading">Загрузка...</div>
+          <div class="stats-error" id="stats-error">Ошибка загрузки</div>
+        </div>
       </div>
+
+      <!-- Итог -->
       <div id="result-tab" class="content-tab">
-        <h2>Тут будет итоговый результат...</h2>
+        <h3>Итоговый результат</h3>
+        <p>Здесь будет итоговый расчёт...</p>
       </div>
     </div>
 
+    <!-- Правая панель -->
     <div class="panel right-panel">
+      <!-- Персонаж -->
       <div id="character-tab" class="content-tab active">
+        <div class="character-panel">
+          <div class="character-header">
+            <h3>Персонаж</h3>
+            <img class="character-icon" src="tab_char_light.png" alt="">
+          </div>
+          <div class="character-body">
 
-        <div class="character-top">
-          <div class="character-title">
-            <h2>Персонаж</h2>
-            <div class="character-tab-icon">
-              <img src="tab_char_light.png" alt="Иконка">
+            <!-- Выбор персонажа и уровень -->
+            <div class="character-info">
+              <img id="selected-character-image"
+                   class="character-image selectable-character"
+                   src="character_image/Castoria.png"
+                   data-id="1" data-path="Память"
+                   title="Кликните для выбора">
+              <div class="character-details">
+                <div id="character-name" class="char-name">Имя персонажа</div>
+                <div id="character-stars" class="char-stars">★★★★★</div>
+                <div class="char-level-line">
+                  <span>Уровень:</span>
+                  <button class="btn-minus" onclick="changeLevel(-1)">−</button>
+                  <span class="char-level"><span id="level-display">1</span>/80</span>
+                  <input type="range" id="level-range" min="0" max="7" step="1">
+                  <button class="btn-plus" onclick="changeLevel(1)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ползунки навыков -->
+            <div class="character-stats">
+              <!-- Базовая атака -->
+              <div class="stat-row">
+                <span>Базовая атака</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('basic-attack', -1)">−</button>
+                  <input type="range" id="basic-attack" min="1" max="10" value="1">
+                  <button class="btn-plus" onclick="changeValue('basic-attack', 1)">+</button>
+                  <span id="basic-attack-display">1</span>
+                </div>
+              </div>
+              <!-- Навык -->
+              <div class="stat-row">
+                <span>Навык</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('skill', -1)">−</button>
+                  <input type="range" id="skill" min="1" max="15" value="1">
+                  <button class="btn-plus" onclick="changeValue('skill', 1)">+</button>
+                  <span id="skill-display">1</span>
+                </div>
+              </div>
+              <!-- Сверхспособность -->
+              <div class="stat-row">
+                <span>Сверхспособность</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('ult', -1)">−</button>
+                  <input type="range" id="ult" min="1" max="15" value="1">
+                  <button class="btn-plus" onclick="changeValue('ult', 1)">+</button>
+                  <span id="ult-display">1</span>
+                </div>
+              </div>
+              <!-- Талант -->
+              <div class="stat-row">
+                <span>Талант</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('talent', -1)">−</button>
+                  <input type="range" id="talent" min="1" max="15" value="1">
+                  <button class="btn-plus" onclick="changeValue('talent', 1)">+</button>
+                  <span id="talent-display">1</span>
+                </div>
+              </div>
+              <!-- Дух памяти (скрыты по умолчанию) -->
+              <div class="stat-row spirit-row">
+                <span>Навык духа памяти</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('spirit-skill', -1)">−</button>
+                  <input type="range" id="spirit-skill" min="1" max="10" value="1">
+                  <button class="btn-plus" onclick="changeValue('spirit-skill', 1)">+</button>
+                  <span id="spirit-skill-display">1</span>
+                </div>
+              </div>
+              <div class="stat-row spirit-row">
+                <span>Талант духа памяти</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('spirit-talent', -1)">−</button>
+                  <input type="range" id="spirit-talent" min="1" max="10" value="1">
+                  <button class="btn-plus" onclick="changeValue('spirit-talent', 1)">+</button>
+                  <span id="spirit-talent-display">1</span>
+                </div>
+              </div>
+              <!-- Эйдолоны -->
+              <div class="stat-row">
+                <span>Эйдолоны</span>
+                <div class="stat-control">
+                  <button class="btn-minus" onclick="changeValue('eidolon', -1)">−</button>
+                  <input type="range" id="eidolon" min="0" max="6" value="0">
+                  <button class="btn-plus" onclick="changeValue('eidolon', 1)">+</button>
+                  <span id="eidolon-display">0</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="character-content">
-          <div class="character-info">
-            <img class="character-image" src="placeholder_character.png" alt="Персонаж">
-            <div class="char-name-block">
-              <div class="char-name">Мавуика</div>
-              <div class="char-stars">★★★★★</div>
-              <div class="char-level">Уровень <span id="level-value">1</span>/80</div>
-            </div>
+        <!-- Улучшения -->
+        <div class="upgrades-panel">
+          <div class="upgrades-header">
+            <h3>Улучшения</h3>
+            <button id="toggle-all-upgrades">Вкл все</button>
           </div>
-
-          <div class="character-settings">
-            <div class="char-setting-row">
-              <span class="char-setting-label">Базовая атака</span>
-              <div class="char-setting-control">
-                <button class="btn-minus" onclick="changeValue('basic-attack', -1)">−</button>
-                <input type="range" id="basic-attack" min="1" max="10" value="1" oninput="updateDisplay('basic-attack')">
-                <button class="btn-plus" onclick="changeValue('basic-attack', 1)">+</button>
-                <span class="char-setting-value" id="basic-attack-display">1</span>
-              </div>
-            </div>
-
-            <div class="char-setting-row">
-              <span class="char-setting-label">Навык</span>
-              <div class="char-setting-control">
-                <button class="btn-minus" onclick="changeValue('skill', -1)">−</button>
-                <input type="range" id="skill" min="1" max="15" value="1" oninput="updateDisplay('skill')">
-                <button class="btn-plus" onclick="changeValue('skill', 1)">+</button>
-                <span class="char-setting-value" id="skill-display">1</span>
-              </div>
-            </div>
-
-            <div class="char-setting-row">
-              <span class="char-setting-label">Сверхспособность</span>
-              <div class="char-setting-control">
-                <button class="btn-minus" onclick="changeValue('ult', -1)">−</button>
-                <input type="range" id="ult" min="1" max="15" value="1" oninput="updateDisplay('ult')">
-                <button class="btn-plus" onclick="changeValue('ult', 1)">+</button>
-                <span class="char-setting-value" id="ult-display">1</span>
-              </div>
-            </div>
-
-            <div class="char-setting-row">
-              <span class="char-setting-label">Эйдолоны</span>
-              <div class="char-setting-control">
-                <button class="btn-minus" onclick="changeValue('eidolon', -1)">−</button>
-                <input type="range" id="eidolon" min="0" max="6" value="0" oninput="updateDisplay('eidolon')">
-                <button class="btn-plus" onclick="changeValue('eidolon', 1)">+</button>
-                <span class="char-setting-value" id="eidolon-display">0</span>
-              </div>
-            </div>
-          </div>
+          <div id="upgrades-list" class="upgrades-list"></div>
         </div>
 
+        <!-- Следы -->
+        <div class="traces-panel">
+          <h3>Следы</h3>
+          <div id="traces-list" class="traces-list"></div>
+        </div>
+
+        <!-- Модалка выбора персонажа -->
+        <div id="character-modal" class="modal">
+          <div class="modal-content">
+            <h3>Выберите персонажа</h3>
+            <!-- фильтры -->
+            <div class="sort-section-modal">
+              <!-- rarity, damageType, path как у вас было -->
+            </div>
+            <div id="character-list-modal" class="character-list"></div>
+          </div>
+        </div>
       </div>
+
+      <!-- Заглушки для остальных табов -->
       <div id="lightcone-tab" class="content-tab">
-        <h2>Тут будет контейнер конуса света...</h2>
+        <h3>Конус света</h3>
       </div>
       <div id="relics-tab" class="content-tab">
-        <h2>Тут будет контейнер реликвий...</h2>
+        <h3>Реликвии</h3>
       </div>
       <div id="buffs-tab" class="content-tab">
-        <h2>Тут будет контейнер баффов...</h2>
+        <h3>Баффы</h3>
       </div>
     </div>
   </div>
@@ -123,6 +209,5 @@
   </div>
 
   <script src="hsr_calculator_script.js"></script>
-
 </body>
 </html>
