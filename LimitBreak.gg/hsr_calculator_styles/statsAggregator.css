@@ -1,0 +1,24 @@
+.stat-bonus-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  color: white;
+  table-layout: fixed; /* помогает растянуть */
+}
+
+.stat-bonus-table th,
+.stat-bonus-table td {
+  border: 1px solid #444;
+  padding: 6px 10px;
+  text-align: left;
+  width: 33%; /* делим на 3 столбца */
+  word-wrap: break-word;
+}
+
+.stat-bonus-table th {
+  background-color: #222;
+}
+
+.stat-bonus-table tr:nth-child(even) {
+  background-color: #2a2a2a;
+}

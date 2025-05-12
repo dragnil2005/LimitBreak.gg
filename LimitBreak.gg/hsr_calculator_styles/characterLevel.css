@@ -1,0 +1,224 @@
+/* characterLevel.css */
+
+/* ============================= */
+/* 1. Основная раскладка вкладки */
+/* ============================= */
+#character-tab {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5em;
+}
+
+.character-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  min-width: 280px;
+}
+
+/* ============================= */
+/* 2. Карточка персонажа + слайдер уровня */
+/* ============================= */
+.character-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+/* Контейнер под все блоки уровней/скилов */
+.character-level-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+/* Блок «Уровень персонажа» */
+.level-block {
+  display: grid;
+  /* колонки: метка | трек | значение */
+  grid-template-columns: 150px 1fr 40px;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.level-block .level-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+.level-block .skill-slider {
+  width: 100%;
+}
+
+.level-block .level-value {
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+}
+
+/* ============================= */
+/* 3. Контейнер списков скилов */
+/* ============================= */
+.skills-container {
+  flex: 1;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+/* Каждый скил-ряд */
+.skills-list .skill-block {
+  display: grid;
+  /* колонки: метка | минус | трек | плюс | значение */
+  grid-template-columns: 150px 24px 1fr 24px 40px;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.skills-list .skill-block .level-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+/* Кнопки «−» / «+» */
+.minus-btn,
+.plus-btn {
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Трек слайдера */
+.skill-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #444;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.skill-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00eaff;
+  cursor: pointer;
+  border: none;
+}
+
+.skill-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00eaff;
+  cursor: pointer;
+  border: none;
+}
+
+/* Отображение текущего значения */
+.skill-value,
+.level-value {
+  font-weight: bold;
+  color: #fff;
+  min-width: 2em;
+  text-align: center;
+  justify-self: end;
+}
+
+/* Разделитель между группами скилов */
+.skill-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: #444;
+  margin: 0.5em 0;
+}
+
+/* ============================= */
+/* 4. Адаптив для узких экранов */
+/* ============================= */
+@media (max-width: 800px) {
+  #character-tab {
+    flex-direction: column;
+  }
+  .character-selector {
+    flex-direction: column;
+  }
+  .level-block,
+  .skills-list .skill-block {
+    grid-template-columns: 1fr;
+  }
+  .minus-btn,
+  .plus-btn,
+  .skill-value,
+  .level-value {
+    justify-self: start;
+  }
+}
+/* Стили для блока Эйдолонов, как у блока уровня персонажа */
+.eidolon-block {
+  display: grid;
+  /* точно такие же колонки, как у .level-block */
+  grid-template-columns: 150px 1fr 40px;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.eidolon-block .level-label {
+  /* если нужно, наследовать те же стили */
+  font-size: 14px;
+  font-weight: bold;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+.eidolon-block .skill-slider {
+  /* чтобы трек растягивался на всю доступную ширину */
+  width: 100%;
+}
+
+.eidolon-block .level-value {
+  /* наследуем стили отображения значения */
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+}
+/* Новая верхняя строка: две колонки */
+.character-top-row {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* Левая часть */
+.character-left {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Правая часть (скиллы) */
+.character-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

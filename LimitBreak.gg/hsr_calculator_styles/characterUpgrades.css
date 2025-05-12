@@ -1,0 +1,60 @@
+/* Контейнер апгрейдов */
+#upgrade-container {
+  padding: 1em;
+  background-color: #1c1c2c;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Кнопка вкл/выкл все — справа сверху */
+.upgrade-toggle-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 10px;
+  font-size: 12px;
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Список апгрейдов */
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 36px; /* чтобы не пересекалась с кнопкой */
+}
+
+/* Одна строка апгрейда */
+.upgrade-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #252535;
+  border: 1px solid #444;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Текст */
+.upgrade-entry span {
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* Чекбокс */
+.upgrade-entry input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}

@@ -1,0 +1,134 @@
+/* navigation.css — с прокруткой в активном контейнере */
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #0e1021;
+  color: #f0f0f0;
+  height: 100vh;
+  overflow: hidden; /* запрещаем прокрутку всей страницы */
+}
+
+.calculator-container {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  height: 100vh;
+  width: 100vw;
+  background-color: #0e1021;
+}
+
+/* ==== БОКОВЫЕ ПАНЕЛИ ==== */
+.tab-navigation-left,
+.tab-navigation-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #0e1021;
+  padding: 10px 0;
+  gap: 14px;
+}
+
+.tab-navigation-left {
+  grid-column: 1 / 2;
+  border-right: 1px solid #1a1c3b;
+}
+
+.tab-navigation-right {
+  grid-column: 3 / 4;
+  border-left: 1px solid #1a1c3b;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.tab-btn img {
+  width: 50px;
+  height: 50px;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.tab-btn.active img {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px #00eaff);
+}
+
+/* Новое: убрать отображение всех вложенных .tab-container внутри character-tab */
+
+
+.left-container .tab-container,
+.right-container .tab-container {
+  display: none;
+}
+.left-container .tab-container.active,
+.right-container .tab-container.active {
+  display: block;
+}
+
+
+/* ==== ГЛАВНЫЙ КОНТЕНТ ==== */
+.main-content {
+  grid-column: 2 / 3;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 10px 20px 10px;
+  height: 100%;
+  gap: 16px;
+  box-sizing: border-box;
+  align-items: stretch;
+  overflow: hidden; /* предотвратить общую прокрутку */
+}
+
+/* ==== Контейнеры ==== */
+.left-container,
+.right-container {
+  flex: 1;
+  height: 100%;
+  background-color: #11132a;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-y: auto; /* ← локальная прокрутка */
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Кастомный скроллбар для всех контейнеров с прокруткой */
+.right-container,
+.left-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00eaff30 transparent;
+}
+
+/* Для WebKit-браузеров (Chrome, Edge, Safari) */
+.right-container::-webkit-scrollbar,
+.left-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right-container::-webkit-scrollbar-track,
+.left-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.right-container::-webkit-scrollbar-thumb,
+.left-container::-webkit-scrollbar-thumb {
+  background-color: #00eaff70;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.right-container:hover::-webkit-scrollbar-thumb,
+.left-container:hover::-webkit-scrollbar-thumb {
+  background-color: #00eaff;
+}

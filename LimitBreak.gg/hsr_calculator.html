@@ -1,213 +1,208 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HSR Калькулятор — LimitBreak.gg</title>
-  <link rel="stylesheet" href="hsr_calculator_style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Калькулятор HSR - LimitBreak.gg</title>
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="hsr_calculator_styles/navigation.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/character.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/modalSelector.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/characterLevel.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/characterUpgrades.css">
+  <link rel="stylesheet" href="hsr_calculator_styles/characterTraces.css">
+  <link rel="stylesheet" href="hsr_calculator_styles/stats_tab.css">
+  <link rel="stylesheet" href="hsr_calculator_styles/statsAggregator.css">
 </head>
 <body>
 
-  <!-- Левая таб-панель -->
-  <div class="side-tabs left-tabs">
-    <button class="tab-btn active" data-target="stats-tab" data-side="left" title="Статы">
-      <img src="tab_stats_light.png" alt="Статы">
-    </button>
-    <button class="tab-btn" data-target="result-tab" data-side="left" title="Итог">
-      <img src="tab_share_light.png" alt="Итог">
-    </button>
-  </div>
-
-  <!-- Основной контент -->
-  <div class="main-content">
-
-    <!-- Левая панель -->
-    <div class="panel left-panel">
-      <!-- Статы -->
-      <div id="stats-tab" class="content-tab active">
-        <div class="stats-panel">
-          <h3>Статистика</h3>
-          <table class="stats-table" id="stats-table">
-            <thead>
-              <tr><th>Показатель</th><th>Значение</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="stats-loading" id="stats-loading">Загрузка...</div>
-          <div class="stats-error" id="stats-error">Ошибка загрузки</div>
-        </div>
-      </div>
-
-      <!-- Итог -->
-      <div id="result-tab" class="content-tab">
-        <h3>Итоговый результат</h3>
-        <p>Здесь будет итоговый расчёт...</p>
+  <div class="calculator-container">
+    <!-- ===== ЛЕВАЯ НАВИГАЦИЯ ===== -->
+    <div class="tab-navigation-left">
+      <div class="left-tabs">
+        <button class="tab-btn active" data-target="stats-tab">
+          <img src="tab_buttons/tab_stats_light.png" alt="Статистика" title="Характеристики персонажа">
+        </button>
+        <button class="tab-btn" data-target="builds-tab">
+          <img src="tab_buttons/tab_share_light.png" alt="Сборки" title="Мои сборки">
+        </button>
       </div>
     </div>
 
-    <!-- Правая панель -->
-    <div class="panel right-panel">
-      <!-- Персонаж -->
-      <div id="character-tab" class="content-tab active">
-        <div class="character-panel">
-          <div class="character-header">
-            <h3>Персонаж</h3>
-            <img class="character-icon" src="tab_char_light.png" alt="">
-          </div>
-          <div class="character-body">
-
-            <!-- Выбор персонажа и уровень -->
-            <div class="character-info">
-              <img id="selected-character-image"
-                   class="character-image selectable-character"
-                   src="character_image/Castoria.png"
-                   data-id="1" data-path="Память"
-                   title="Кликните для выбора">
-              <div class="character-details">
-                <div id="character-name" class="char-name">Имя персонажа</div>
-                <div id="character-stars" class="char-stars">★★★★★</div>
-                <div class="char-level-line">
-                  <span>Уровень:</span>
-                  <button class="btn-minus" onclick="changeLevel(-1)">−</button>
-                  <span class="char-level"><span id="level-display">1</span>/80</span>
-                  <input type="range" id="level-range" min="0" max="7" step="1">
-                  <button class="btn-plus" onclick="changeLevel(1)">+</button>
-                </div>
-              </div>
+    <!-- ===== ЦЕНТРАЛЬНЫЙ КОНТЕНТ ===== -->
+    <div class="main-content">
+      <!-- Левая колонка -->
+      <div class="left-container">
+        <div id="stats-tab" class="tab-container active">
+          <!-- Базовые характеристики -->
+          <div class="stats-section">
+            <h3>Базовые характеристики</h3>
+            <div class="stats-table" id="basic-stats-list">
+              <!-- Каждая строка: Название | Базовое | +Процент | +Флэт | Всего -->
             </div>
+          </div>
 
-            <!-- Ползунки навыков -->
-            <div class="character-stats">
-              <!-- Базовая атака -->
-              <div class="stat-row">
-                <span>Базовая атака</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('basic-attack', -1)">−</button>
-                  <input type="range" id="basic-attack" min="1" max="10" value="1">
-                  <button class="btn-plus" onclick="changeValue('basic-attack', 1)">+</button>
-                  <span id="basic-attack-display">1</span>
-                </div>
-              </div>
-              <!-- Навык -->
-              <div class="stat-row">
-                <span>Навык</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('skill', -1)">−</button>
-                  <input type="range" id="skill" min="1" max="15" value="1">
-                  <button class="btn-plus" onclick="changeValue('skill', 1)">+</button>
-                  <span id="skill-display">1</span>
-                </div>
-              </div>
-              <!-- Сверхспособность -->
-              <div class="stat-row">
-                <span>Сверхспособность</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('ult', -1)">−</button>
-                  <input type="range" id="ult" min="1" max="15" value="1">
-                  <button class="btn-plus" onclick="changeValue('ult', 1)">+</button>
-                  <span id="ult-display">1</span>
-                </div>
-              </div>
-              <!-- Талант -->
-              <div class="stat-row">
-                <span>Талант</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('talent', -1)">−</button>
-                  <input type="range" id="talent" min="1" max="15" value="1">
-                  <button class="btn-plus" onclick="changeValue('talent', 1)">+</button>
-                  <span id="talent-display">1</span>
-                </div>
-              </div>
-              <!-- Дух памяти (скрыты по умолчанию) -->
-              <div class="stat-row spirit-row">
-                <span>Навык духа памяти</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('spirit-skill', -1)">−</button>
-                  <input type="range" id="spirit-skill" min="1" max="10" value="1">
-                  <button class="btn-plus" onclick="changeValue('spirit-skill', 1)">+</button>
-                  <span id="spirit-skill-display">1</span>
-                </div>
-              </div>
-              <div class="stat-row spirit-row">
-                <span>Талант духа памяти</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('spirit-talent', -1)">−</button>
-                  <input type="range" id="spirit-talent" min="1" max="10" value="1">
-                  <button class="btn-plus" onclick="changeValue('spirit-talent', 1)">+</button>
-                  <span id="spirit-talent-display">1</span>
-                </div>
-              </div>
-              <!-- Эйдолоны -->
-              <div class="stat-row">
-                <span>Эйдолоны</span>
-                <div class="stat-control">
-                  <button class="btn-minus" onclick="changeValue('eidolon', -1)">−</button>
-                  <input type="range" id="eidolon" min="0" max="6" value="0">
-                  <button class="btn-plus" onclick="changeValue('eidolon', 1)">+</button>
-                  <span id="eidolon-display">0</span>
-                </div>
-              </div>
+          <hr class="stats-divider" />
+
+          <!-- Продвинутые характеристики -->
+          <div class="stats-section">
+            <h3>Продвинутые характеристики</h3>
+            <div class="stats-table" id="advanced-stats-list">
+              <!-- Каждая строка: Название | Значение % -->
+            </div>
+          </div>
+
+          <hr class="stats-divider" />
+
+          <!-- Типы урона -->
+          <div class="stats-section">
+            <h3>Тип урона</h3>
+            <div class="stats-table" id="damage-type-stats-list">
+              <!-- Каждая строка: Название | Базовое | +Процент | Всего -->
+            </div>
+          </div>
+
+          <hr class="stats-divider" />
+
+          <!-- Игнор сопротивлений -->
+          <div class="stats-section">
+            <h3>Игнорирование сопротивлений</h3>
+            <div class="stats-table" id="resist-ignore-stats-list">
+              <!-- Каждая строка: Название | Значение % -->
             </div>
           </div>
         </div>
 
-        <!-- Улучшения -->
-        <div class="upgrades-panel">
-          <div class="upgrades-header">
-            <h3>Улучшения</h3>
-            <button id="toggle-all-upgrades">Вкл все</button>
-          </div>
-          <div id="upgrades-list" class="upgrades-list"></div>
-        </div>
+        <div id="builds-tab" class="tab-container"></div>
+      </div>
 
-        <!-- Следы -->
-        <div class="traces-panel">
-          <h3>Следы</h3>
-          <div id="traces-list" class="traces-list"></div>
-        </div>
+    <!-- Правая колонка -->
+    <div class="right-container">
+      <div id="character-tab" class="tab-container active">
 
-        <!-- Модалка выбора персонажа -->
-        <div id="character-modal" class="modal">
-          <div class="modal-content">
-            <h3>Выберите персонажа</h3>
-            <!-- фильтры -->
-            <div class="sort-section-modal">
-              <!-- rarity, damageType, path как у вас было -->
+        <!-- Верхняя часть: персонаж + скиллы -->
+        <!-- Верх: 2 колонки -->
+        <div class="character-top-row">
+          <!-- Левая колонка -->
+          <div class="character-left">
+            <div class="character-selector">
+              <div class="selected-character-card" id="selected-character">
+                <img id="selected-character-image" class="character-portrait" src="" alt="Персонаж">
+                <div class="character-info">
+                  <div class="char-name" id="char-name">Загрузка...</div>
+                  <div class="char-stars" id="char-stars"></div>
+                  <div class="char-meta">
+                    <span class="char-meta-item">
+                      <img id="char-path-icon" class="char-icon" src="" alt="">
+                      <span id="char-path-label"></span>
+                    </span>
+                    <span class="char-meta-item">
+                      <img id="char-dmg-icon" class="char-icon" src="" alt="">
+                      <span id="char-dmg-label"></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div id="character-list-modal" class="character-list"></div>
+          </div>
+
+          <!-- Правая колонка -->
+          <div class="character-right">
+            <div id="character-level-container" class="character-level-block"></div>
+          </div>
+        </div>
+
+        <!-- Нижние блоки идут отдельно -->
+        
+        <div id="upgrade-container"></div>
+        <div id="trace-container"></div>
+        <div id="stat-breakdown-container" class="stat-breakdown-container">
+          <h3>Список прибавок к характеристикам</h3>
+          <div id="stat-breakdown-list" class="stat-breakdown-list">
+            <!-- Сюда будет заполняться таблица -->
           </div>
         </div>
       </div>
+      <div id="lightcone-tab" class="tab-container">
+          <h2 style="color: white;">Вкладка: Световой конус</h2>
+        </div>
 
-      <!-- Заглушки для остальных табов -->
-      <div id="lightcone-tab" class="content-tab">
-        <h3>Конус света</h3>
-      </div>
-      <div id="relics-tab" class="content-tab">
-        <h3>Реликвии</h3>
-      </div>
-      <div id="buffs-tab" class="content-tab">
-        <h3>Баффы</h3>
+        <div id="relics-tab" class="tab-container">
+          <h2 style="color: white;">Вкладка: Реликвии</h2>
+        </div>
+
+        <div id="buffs-tab" class="tab-container">
+          <h2 style="color: white;">Вкладка: Бонусы</h2>
+        </div>
+
+        <div id="team-tab" class="tab-container">
+          <h2 style="color: white;">Вкладка: Отряд</h2>
+        </div>
+
+        <div id="damage-tab" class="tab-container">
+          <h2 style="color: white;">Вкладка: Подсчёт урона</h2>
+        </div>
+    </div>
+
+    <!-- ===== ПРАВАЯ НАВИГАЦИЯ ===== -->
+    <div class="tab-navigation-right">
+      <div class="right-tabs">
+        <button class="tab-btn active" data-target="character-tab">
+          <img src="tab_buttons/tab_char_light.png" alt="Персонаж" title="Персонаж">
+        </button>
+        <button class="tab-btn" data-target="lightcone-tab">
+          <img src="tab_buttons/tab_weapon_light.png" alt="Световой конус" title="Световой конус">
+        </button>
+        <button class="tab-btn" data-target="relics-tab">
+          <img src="tab_buttons/tab_artifact_light.png" alt="Реликвии" title="Реликвии">
+        </button>
+        <button class="tab-btn" data-target="buffs-tab">
+          <img src="tab_buttons/tab_buff_dark.png" alt="Бонусы" title="Произвольные бонусы">
+        </button>
+        <button class="tab-btn" data-target="team-tab">
+          <img src="tab_buttons/tab_team_light.png" alt="Отряд" title="Отряд">
+        </button>
+        <button class="tab-btn" data-target="damage-tab">
+          <img src="tab_buttons/tab_rotation_light.png" alt="Урон" title="Подсчёт урона">
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Правая таб-панель -->
-  <div class="side-tabs right-tabs">
-    <button class="tab-btn active" data-target="character-tab" data-side="right" title="Персонаж">
-      <img src="tab_char_light.png" alt="Персонаж">
-    </button>
-    <button class="tab-btn" data-target="lightcone-tab" data-side="right" title="Конус">
-      <img src="tab_weapon_light.png" alt="Конус">
-    </button>
-    <button class="tab-btn" data-target="relics-tab" data-side="right" title="Реликвии">
-      <img src="tab_artifact_light.png" alt="Реликвии">
-    </button>
-    <button class="tab-btn" data-target="buffs-tab" data-side="right" title="Баффы">
-      <img src="tab_buffs_light.png" alt="Баффы">
-    </button>
+  <!-- ===== МОДАЛКА ВЫБОРА ПЕРСОНАЖА ===== -->
+  <div id="character-modal" class="character-modal">
+    <div class="character-modal-content">
+      <h2>Персонажи <span id="char-count">(0)</span></h2>
+
+      <div class="filters-container">
+        <div class="filter-group" id="rarity-filter">
+          <label>Редкость:</label>
+          <button data-value="all" class="active">Все</button>
+          <button data-value="4">4★</button>
+          <button data-value="5">5★</button>
+        </div>
+
+        <div class="filter-group" id="dmg-type-filter">
+          <label>Тип урона:</label>
+          <button data-value="all" class="active">Все</button>
+          <!-- типы урона добавятся скриптом -->
+        </div>
+
+        <div class="filter-group" id="path-filter">
+          <label>Путь персонажа:</label>
+          <button data-value="all" class="active">Все</button>
+          <!-- пути добавятся скриптом -->
+        </div>
+      </div>
+
+      <div class="character-grid" id="character-list">
+        <!-- карточки персонажей будут отрисовываться скриптом -->
+      </div>
+    </div>
   </div>
 
-  <script src="hsr_calculator_script.js"></script>
+  <!-- JS -->
+  <script type="module" src="hsr_calculator_script/main.js"></script>
 </body>
 </html>
