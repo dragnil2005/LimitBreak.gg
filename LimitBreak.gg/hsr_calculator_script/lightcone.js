@@ -74,6 +74,9 @@ function renderStatInfo(stat, container) {
       <li>DEF: ${stat.def}</li>
     </ul>
   `;
+  window.dispatchEvent(new CustomEvent('weaponStatsChanged', {
+    detail: { hp: stat.hp, atk: stat.atk, def: stat.def }
+  }));
 }
 
 function renderSkillInfo(level, skills, container) {

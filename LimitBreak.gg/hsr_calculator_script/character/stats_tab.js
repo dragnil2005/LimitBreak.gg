@@ -2,10 +2,16 @@ import { addStatUpdateListener, getFinalStatBonuses } from './statsAggregator.js
 
 let lastStats = null;
 let lastLevel = null;
+let lastWeaponBonus = { hp: 0, atk: 0, def: 0 };
 
-export function initCharacterStats(stats, level) {
+export function initCharacterStats(stats, level, weaponBonus = { hp: 0, atk: 0, def: 0 }) {
   lastStats = stats;
   lastLevel = level;
+  lastWeaponBonus  = {
+    hp:  parseFloat(weaponBonus.hp  || 0),
+    atk: parseFloat(weaponBonus.atk || 0),
+    def: parseFloat(weaponBonus.def || 0),
+  };
 
   const external = getFinalStatBonuses();
   window.calculatedBonuses = {};
@@ -106,9 +112,10 @@ export function initCharacterStats(stats, level) {
   baseStats.forEach(stat => {
     const label = statLabels[stat];
     const base = parseFloat(levelStats[stat] || 0);
+    const weapFlat = lastWeaponBonus[stat] || 0;
     const percent = parseFloat(window.calculatedBonuses?.[`${stat}_percent`] || 0);
     const flat = parseFloat(window.calculatedBonuses?.[`${stat}_flat`] || 0);
-    addRow(baseTable, label, base, percent, flat);
+    addRow(baseTable, label, base + weapFlat, percent, flat);
   });
 
   const advancedTable = createSection(sectionTitles.advanced);
