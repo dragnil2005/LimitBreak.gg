@@ -14,6 +14,9 @@
   <link rel="stylesheet" href="hsr_calculator_styles/characterTraces.css">
   <link rel="stylesheet" href="hsr_calculator_styles/stats_tab.css">
   <link rel="stylesheet" href="hsr_calculator_styles/statsAggregator.css">
+  <link rel="stylesheet" href="hsr_calculator_styles/lightcone.css">
+  <link rel="stylesheet" href="hsr_calculator_styles/weaponSelector.css" />
+
 </head>
 <body>
 
@@ -124,9 +127,39 @@
           </div>
         </div>
       </div>
-      <div id="lightcone-tab" class="tab-container">
-          <h2 style="color: white;">Вкладка: Световой конус</h2>
+      <div
+        id="lightcone-tab"
+        class="tab-container">
+        <h2>Световой конус</h2>
+
+        <!-- Картинка -->
+        <div class="weapon-image-container">
+          <img
+            id="selected-weapon-image"
+            src="weapons_image/default.png"
+            alt="Выбранное оружие"
+            style="cursor:pointer; max-width:200px;"
+          />
         </div>
+
+        <!-- Слайдер уровня -->
+        <div class="slider-group">
+          <label for="stats-slider">Уровень оружия:</label>
+          <input id="stats-slider" type="range" />
+          <span id="stats-slider-value"></span>
+        </div>
+
+        <!-- Слайдер пробуждения -->
+        <div class="slider-group">
+          <label for="skills-slider">Пробуждение:</label>
+          <input id="skills-slider" type="range" />
+          <span id="skills-slider-value"></span>
+        </div>
+
+        <!-- Информация по stats и skills -->
+        <div id="stats-info"></div>
+        <div id="skills-info"></div>
+      </div>
 
         <div id="relics-tab" class="tab-container">
           <h2 style="color: white;">Вкладка: Реликвии</h2>
@@ -202,7 +235,36 @@
     </div>
   </div>
 
+    <!-- ===== МОДАЛКА ВЫБОРА ОРУЖИЯ ===== -->
+  <div id="weapon-modal" class="weapon-modal">
+    <div class="weapon-modal-content">
+      <h2>Оружия <span id="weapon-count">(0)</span></h2>
+
+      <div class="filters-container">
+        <div class="filter-group" id="weapon-rarity-filter">
+          <label>Редкость:</label>
+          <button data-value="all" class="active">Все</button>
+          <button data-value="3">3★</button>
+          <button data-value="4">4★</button>
+          <button data-value="5">5★</button>
+        </div>
+        <div class="filter-group" id="weapon-path-filter">
+          <label>Путь:</label>
+          <button data-value="all" class="active">Все</button>
+          <!-- остальные пути добавятся скриптом -->
+        </div>
+      </div>
+
+      <div class="weapon-grid" id="weapon-list"><!-- карточки тут --></div>
+    </div>
+  </div>
+
+  <!-- Подключение скрипта модалки -->
+  <script type="module" src="hsr_calculator_script/weaponSelector.js"></script>
+
+
   <!-- JS -->
   <script type="module" src="hsr_calculator_script/main.js"></script>
+  <script type="module" src="hsr_calculator_script/lightcone.js"></script>
 </body>
 </html>
