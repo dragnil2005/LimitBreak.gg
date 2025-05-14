@@ -1,0 +1,26 @@
+/* buffs.css */
+.buffs-form-container {
+  max-width: 600px;
+  margin-top: 1rem;
+}
+.buffs-form-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.buffs-form-container th,
+.buffs-form-container td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.buffs-form-container th {
+  text-align: left;
+  color: #00ffff;
+}
+.buffs-form-container input[type="number"] {
+  width: 100%;
+  padding: 4px 6px;
+  background: #2a2c42;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+}

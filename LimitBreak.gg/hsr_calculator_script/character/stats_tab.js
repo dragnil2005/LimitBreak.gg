@@ -4,6 +4,8 @@ let lastStats = null;
 let lastLevel = null;
 let lastWeaponBonus = { hp: 0, atk: 0, def: 0 };
 
+export const finalCalculatedStats = {};
+
 export function initCharacterStats(stats, level, weaponBonus = { hp: 0, atk: 0, def: 0 }) {
   lastStats = stats;
   lastLevel = level;
@@ -57,7 +59,7 @@ export function initCharacterStats(stats, level, weaponBonus = { hp: 0, atk: 0, 
     physical_res_ignore: 'Игнор физ. сопр.', fire_res_ignore: 'Игнор огн. сопр.',
     ice_res_ignore: 'Игнор лед. сопр.', lightning_res_ignore: 'Игнор элек. сопр.',
     wind_res_ignore: 'Игнор ветр. сопр.', quantum_res_ignore: 'Игнор квант. сопр.',
-    imaginary_res_ignore: 'Игнор мним. сопр.'
+    imaginary_res_ignore: 'Игнор мним. сопр.', def_res_ignore: 'Игнор защиты противника'
   };
 
   const statsContainer = document.getElementById('stats-tab');
@@ -105,6 +107,34 @@ export function initCharacterStats(stats, level, weaponBonus = { hp: 0, atk: 0, 
     row.appendChild(totalCell);
 
     table.appendChild(row);
+
+    if (label === 'HP')                             finalCalculatedStats['hp'] = total;
+    if (label === 'Сила атаки')                     finalCalculatedStats['atk'] = total;
+    if (label === 'Защита')                         finalCalculatedStats['def'] = total;
+    if (label === 'Скорость')                       finalCalculatedStats['speed'] = total;
+    if (label === 'Крит. шанс')                     finalCalculatedStats['crit_rate'] = total;
+    if (label === 'Крит. урон')                     finalCalculatedStats['crit_dmg'] = total;
+    if (label === 'Эффект пробития')                finalCalculatedStats['effect_hit'] = total;
+    if (label === 'Бонус исцеления')                finalCalculatedStats['heal_boost'] = total;
+    if (label === 'Скорость восстановления энергии') finalCalculatedStats['energy_regen'] = total;
+    if (label === 'Шанс попадания эффектов')        finalCalculatedStats['effect_hit_rate'] = total;
+    if (label === 'Сопротивление эффектам')         finalCalculatedStats['effect_res'] = total;
+    if (label === 'Бонус физ. урона')               finalCalculatedStats['physical_dmg'] = total;
+    if (label === 'Бонус огн. урона')               finalCalculatedStats['fire_dmg'] = total;
+    if (label === 'Бонус лед. урона')               finalCalculatedStats['ice_dmg'] = total;
+    if (label === 'Бонус элек. урона')              finalCalculatedStats['lightning_dmg'] = total;
+    if (label === 'Бонус ветр. урона')              finalCalculatedStats['wind_dmg'] = total;
+    if (label === 'Бонус квант. урона')             finalCalculatedStats['quantum_dmg'] = total;
+    if (label === 'Бонус мним. урона')              finalCalculatedStats['imaginary_dmg'] = total;
+    if (label === 'Бонус всего урона')              finalCalculatedStats['all_dmg'] = total;
+    if (label === 'Игнор физ. сопр.')               finalCalculatedStats['physical_res_ignore'] = total;
+    if (label === 'Игнор огн. сопр.')               finalCalculatedStats['fire_res_ignore'] = total;
+    if (label === 'Игнор лед. сопр.')               finalCalculatedStats['ice_res_ignore'] = total;
+    if (label === 'Игнор элек. сопр.')              finalCalculatedStats['lightning_res_ignore'] = total;
+    if (label === 'Игнор ветр. сопр.')              finalCalculatedStats['wind_res_ignore'] = total;
+    if (label === 'Игнор квант. сопр.')             finalCalculatedStats['quantum_res_ignore'] = total;
+    if (label === 'Игнор мним. сопр.')              finalCalculatedStats['imaginary_res_ignore'] = total;
+    if (label === 'Игнор защиты противника')        finalCalculatedStats['def_res_ignore'] = total;
   }
 
   // Секции
@@ -135,7 +165,7 @@ export function initCharacterStats(stats, level, weaponBonus = { hp: 0, atk: 0, 
   });
 
   const ignoreTable = createSection(sectionTitles.ignore);
-  ['physical_res_ignore', 'fire_res_ignore', 'ice_res_ignore', 'lightning_res_ignore', 'wind_res_ignore', 'quantum_res_ignore', 'imaginary_res_ignore'].forEach(stat => {
+  ['physical_res_ignore', 'fire_res_ignore', 'ice_res_ignore', 'lightning_res_ignore', 'wind_res_ignore', 'quantum_res_ignore', 'imaginary_res_ignore', 'def_res_ignore'].forEach(stat => {
     const label = statLabels[stat];
     const base = parseFloat(levelStats[stat] || 0);
     const percent = parseFloat(window.calculatedBonuses?.[`${stat}_percent`] || 0);

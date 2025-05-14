@@ -50,7 +50,7 @@ export function getFinalStatBonuses() {
 }
 
 const statLabels = {
-  hp_percent: 'HP', atk_percent: 'Сила атаки', def_percent: 'Защита', speed: 'Скорость', speed_percent: 'Скорость процент',
+  hp_percent: 'HP', atk_percent: 'Сила атаки', def_percent: 'Защита', speed: 'Скорость',
   crit_rate: 'Крит. шанс', crit_dmg: 'Крит. урон', effect_hit: 'Эффект пробития',
   heal_boost: 'Бонус исцеления', energy_regen: 'Скорость восстановления энергии',
   effect_hit_rate: 'Шанс попадания эффектов', effect_res: 'Сопротивление эффектам',
@@ -60,7 +60,7 @@ const statLabels = {
   physical_res_ignore: 'Игнор физ. сопр.', fire_res_ignore: 'Игнор огн. сопр.',
   ice_res_ignore: 'Игнор лед. сопр.', lightning_res_ignore: 'Игнор элек. сопр.',
   wind_res_ignore: 'Игнор ветр. сопр.', quantum_res_ignore: 'Игнор квант. сопр.',
-  imaginary_res_ignore: 'Игнор мним. сопр.'
+  imaginary_res_ignore: 'Игнор мним. сопр.', def_res_ignore: 'Игнор защиты противника'
 };
 
 export function renderStatBreakdownList() {

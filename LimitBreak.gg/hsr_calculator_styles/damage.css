@@ -1,0 +1,50 @@
+#open-skill-list-btn {
+  background: #282a3f;
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+#skill-dropdown {
+  background: #1b1c2e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px;
+  margin-top: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+#skill-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+}
+#skill-dropdown button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.hidden {
+  display: none;
+}
+
+.damage-skill-box {
+  border: 1px solid #00ffff;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 12px;
+  background: #212336;
+}
+.damage-skill-box h3 {
+  margin: 0 0 10px;
+}
+.damage-skill-box p {
+  margin: 2px 0;
+}

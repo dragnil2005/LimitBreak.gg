@@ -10,6 +10,7 @@ import {
 import { initCharacterUpgrades } from './character/characterUpgrades.js';
 import { initCharacterTraces } from './character/characterTraces.js';
 import { initCharacterStats } from './character/stats_tab.js';
+import { initDamageTab } from './damage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabsManager();
@@ -27,10 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Слушаем событие из lightcone.js
   window.addEventListener('weaponStatsChanged', e => {
-    const bonus = e.detail; // { hp, atk, def }
+    const weapbonus = e.detail; // { hp, atk, def }
     const stats = window.currentCharacter?.stats || [];
     const level = window.currentCharLevel || getCharacterLevelData().level;
-    initCharacterStats(stats, level, bonus);
+    initCharacterStats(stats, level, weapbonus);
   });
 
   // Открытие модалки персонажа
@@ -65,6 +66,7 @@ export function loadCharacterById(id) {
 
       initCharacterUpgrades(fullCharacterData, 'upgrade-container');
       initCharacterTraces(fullCharacterData.traces);
+      initDamageTab(fullCharacterData);
 
       // Первый вызов stats без оружейного бонуса
       initCharacterStats(

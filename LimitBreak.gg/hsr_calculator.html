@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="hsr_calculator_styles/statsAggregator.css">
   <link rel="stylesheet" href="hsr_calculator_styles/lightcone.css">
   <link rel="stylesheet" href="hsr_calculator_styles/weaponSelector.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/buffs.css" />
+  <link rel="stylesheet" href="hsr_calculator_styles/damage.css" />
 
 </head>
 <body>
@@ -165,17 +167,38 @@
           <h2 style="color: white;">Вкладка: Реликвии</h2>
         </div>
 
-        <div id="buffs-tab" class="tab-container">
-          <h2 style="color: white;">Вкладка: Бонусы</h2>
+        <div id="buffs-tab" class="tab-container" style="color: white; padding:1rem;">
+          <h2>Вкладка: Бонусы</h2>
+
+          <!-- сюда будем рендерить форму -->
+          <div id="buffs-form-container" class="buffs-form-container"></div>
         </div>
+
+        <!-- и внизу страницы, перед </body> -->
+        <script type="module" src="hsr_calculator_script/buffs.js"></script>
+
 
         <div id="team-tab" class="tab-container">
           <h2 style="color: white;">Вкладка: Отряд</h2>
         </div>
 
-        <div id="damage-tab" class="tab-container">
-          <h2 style="color: white;">Вкладка: Подсчёт урона</h2>
+        <div id="damage-tab" class="tab-container" style="color: white; padding:1rem;">
+          <h2>Вкладка: Подсчёт урона</h2>
+
+          <!-- Кнопка выбора скилла -->
+          <div class="damage-skill-selector">
+            <button id="open-skill-list-btn">Выбрать скилл</button>
+            <div id="skill-dropdown" class="hidden"></div>
+          </div>
+
+          <!-- Контейнер, куда будут добавляться выбранные скиллы -->
+          <div id="damage-calculations-container"></div>
         </div>
+
+        <!-- В head -->
+        <link rel="stylesheet" href="hsr_calculator_styles/damage.css" />
+        <!-- Внизу перед </body> -->
+        <script type="module" src="hsr_calculator_script/damage.js"></script>
     </div>
 
     <!-- ===== ПРАВАЯ НАВИГАЦИЯ ===== -->
@@ -266,5 +289,7 @@
   <!-- JS -->
   <script type="module" src="hsr_calculator_script/main.js"></script>
   <script type="module" src="hsr_calculator_script/lightcone.js"></script>
+  <script type="module" src="hsr_calculator_script/buffs.js"></script>
+  <script type="module" src="hsr_calculator_script/damage.js"></script>
 </body>
 </html>

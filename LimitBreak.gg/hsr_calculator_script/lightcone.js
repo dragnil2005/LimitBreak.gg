@@ -1,4 +1,11 @@
 // lightcone.js
+import {
+  addStatBonusFromSource,
+  removeStatSource,
+  renderStatBreakdownList
+} from './character/statsAggregator.js';
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const tab = document.getElementById('lightcone-tab');
   const weaponId = tab.dataset.weaponId;
@@ -80,27 +87,48 @@ function renderStatInfo(stat, container) {
 }
 
 function renderSkillInfo(level, skills, container) {
-  // Фильтруем нужные умения
   const matched = skills.filter(s => String(s.awaken_level) === String(level));
 
-  // Если нет ни одного — показываем заглушку
-  if (matched.length === 0) {
+  if (!matched.length) {
+    removeStatSource('weaponSkill');
+    renderStatBreakdownList();
     container.innerHTML = `<p>Умений для пробуждения ${level} нет.</p>`;
     return;
   }
 
-  // Собираем все <p> с описаниями
-  const descriptionsHTML = matched
-    .map(s => `<p>${s.description}</p>`)
-    .join('\n');
-
-  // Рендерим
+  // 1) отрисовали описания…
   container.innerHTML = `
     <h4>Пробуждение ${level}</h4>
-    ${descriptionsHTML}
+    ${matched.map(s => `<p>${s.description}</p>`).join('')}
   `;
-}
 
+  // 2) Сбросим старые бонусы от оружия
+  removeStatSource('weaponSkill');
+
+  // 3) Добавим новые — точно так же, как в апгрейдах:
+  matched.forEach(skill => {
+    let statKey = skill.buff_stat;
+    let type    = 'flat';
+
+    if (statKey.endsWith('_percent')) {
+      statKey = statKey.replace(/_percent$/, '');
+      type    = 'percent';
+    } else if (statKey.endsWith('_flat')) {
+      statKey = statKey.replace(/_flat$/, '');
+      type    = 'flat';
+    }
+
+    addStatBonusFromSource(
+      statKey,
+      skill.buff_value,
+      type,
+      'weaponSkill'
+    );
+  });
+
+  // 4) Перерисовать таблицу разбора бонусов
+  renderStatBreakdownList();
+}
 
 
 export { initWeaponUI };
